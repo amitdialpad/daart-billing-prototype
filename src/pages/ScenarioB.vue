@@ -95,7 +95,7 @@
         <div v-if="!isEditingOtherServices" class="usage-list-simple">
           <div v-for="(service, key) in data.otherServicesCredits.allocation" :key="key" class="usage-item-simple">
             <div class="usage-header-simple">
-              <span class="usage-label">{{ key.toUpperCase() }}</span>
+              <span class="usage-label">{{ getServiceLabel(key) }}</span>
               <span class="usage-amount">{{ service.used.toLocaleString() }} / {{ service.allocated.toLocaleString() }} credits</span>
             </div>
             <div class="progress-bar-small">
@@ -106,7 +106,7 @@
 
         <div v-else class="allocation-grid">
           <div v-for="(service, key) in editableOtherServices" :key="key" class="allocation-row">
-            <div class="allocation-service">{{ key.toUpperCase() }}</div>
+            <div class="allocation-service">{{ getServiceLabel(key) }}</div>
             <div class="allocation-input-cell">
               <input
                 type="number"
@@ -528,6 +528,16 @@ const getCurrentTier = () => {
 
 const getNextTier = () => {
   return data.value.tiers.find(t => t.tier === data.value.currentTier + 1)
+}
+
+const getServiceLabel = (key) => {
+  const labels = {
+    'sms': 'SMS/MMS',
+    'international': 'International Calling',
+    'fax': 'Fax',
+    'domestic': 'Domestic Unlimited Calling'
+  }
+  return labels[key] || key
 }
 </script>
 
