@@ -205,7 +205,6 @@
             <li><strong>Show which conversations were charged & why</strong></li>
             <li><strong>Filter by: Skills executed / Agents / Channels / Escalations</strong></li>
             <li>End-to-end conversation view (including transfers)</li>
-            <li><em>← This is what we built in the prototype!</em></li>
           </ul>
 
           <h3>4. Credit Usage / Analytics</h3>
@@ -285,8 +284,6 @@
             <li><strong>Video game arcade with tier cards:</strong> First 100 games cost $1 each. Next 500 games cost $0.80 each. After 1000 games, pay only $0.60 each. Rates adjust automatically as you play more.</li>
             <li><strong>Post-paid phone plan:</strong> Pay at month-end based on actual usage. The more you use, the cheaper each minute becomes. 0-100 mins = $0.10/min, 100-500 mins = $0.08/min, 500+ mins = $0.05/min.</li>
           </ul>
-
-          <p><em>← This is what our prototype is comparing!</em></p>
         </div>
       </div>
     </div>
