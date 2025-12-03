@@ -32,19 +32,21 @@
             <span class="context-separator">•</span>
             Voice ${{ getCurrentTier().voice }}
             <span class="context-separator">•</span>
-            {{ data.conversationsThisMonth }} conversations
+            {{ data.conversationsThisMonth }} conversations ({{ data.conversationsDigital }} digital, {{ data.conversationsVoice }} voice)
           </div>
         </div>
 
         <!-- Progress: To Next Tier -->
         <div class="tier-progress-section">
-          <div class="context-detail">{{ data.conversationsDigital }} digital, {{ data.conversationsVoice }} voice</div>
           <div class="tier-progress-header">
             <span>Progress to Tier {{ data.currentTier + 1 }}: {{ getNextTier().label }}</span>
             <span>{{ data.conversationsToNextTier }} conversations away</span>
           </div>
           <div class="progress-bar-tier">
             <div class="progress-fill" :style="{ width: `${data.progressPercent}%` }"></div>
+          </div>
+          <div class="next-tier-rates">
+            Next tier rates: Digital ${{ getNextTier().digital }} • Voice ${{ getNextTier().voice }}
           </div>
         </div>
 
@@ -640,6 +642,12 @@ h2 {
   color: #CCCCCC;
 }
 
+.context-breakdown {
+  font-size: 14px;
+  color: #666666;
+  margin-top: 8px;
+}
+
 .context-detail {
   font-size: 20px;
   font-weight: 600;
@@ -665,6 +673,13 @@ h2 {
   background-color: #E5E5E5;
   border-radius: 4px;
   overflow: hidden;
+}
+
+.next-tier-rates {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
 }
 
 /* Forecast Line - Consolidated */

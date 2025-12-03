@@ -33,6 +33,12 @@
           </router-link>
         </div>
       </div>
+
+      <div class="sidebar-footer">
+        <router-link to="/notes" class="notes-link" active-class="notes-active">
+          Notes
+        </router-link>
+      </div>
     </nav>
   </aside>
 </template>
@@ -167,6 +173,33 @@ const navItems = ref([
 }
 
 .sub-item.active-sub {
+  background-color: #E5E5F8;
+  color: #000000;
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 8px;
+  border-top: 1px solid #F0F0F0;
+}
+
+.notes-link {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: #AAAAAA;
+  font-size: 13px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.notes-link:hover {
+  background-color: #F9F9F9;
+  color: #888888;
+}
+
+.notes-link.notes-active {
   background-color: #E5E5F8;
   color: #000000;
   font-weight: 600;

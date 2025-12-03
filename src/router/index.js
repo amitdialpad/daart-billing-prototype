@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import ScenarioA from '../pages/ScenarioA.vue'
 import ScenarioB from '../pages/ScenarioB.vue'
+import Notes from '../pages/Notes.vue'
 
 const routes = [
   {
@@ -23,6 +24,15 @@ const routes = [
     meta: {
       title: 'Scenario B: Tiered Rates',
       breadcrumb: 'ADMIN / DIALPADBETA / BILLING / CREDITS (SCENARIO B)'
+    }
+  },
+  {
+    path: '/notes',
+    name: 'Notes',
+    component: Notes,
+    meta: {
+      title: 'PRD Notes',
+      breadcrumb: 'ADMIN / DIALPADBETA / BILLING / NOTES'
     }
   }
 ]
