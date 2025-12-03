@@ -17,11 +17,15 @@ Interactive prototypes comparing two billing approaches for Dialpad's Agentic AI
 
 ## 🚀 Quick Start
 
+### Local Development:
 ```bash
 npm run dev
 ```
 
 **Local URL**: http://localhost:3000/daart-billing-prototype/
+
+### Live Demo:
+**GitHub Pages**: https://amitdialpad.github.io/daart-billing-prototype/
 
 ---
 
