@@ -1,8 +1,8 @@
 # Current State: Implementation Status
 
-**Last Updated**: December 3, 2025, 11:00 AM
+**Last Updated**: December 5, 2025, 8:00 AM
 **Project**: DAART Billing Prototypes (Scenario A & B)
-**Status**: ✅ Deployed & Production Ready
+**Status**: ✅ Deployed & Production Ready (Updated with Dec 4th Josh Feedback)
 
 ---
 
@@ -558,6 +558,62 @@ git push origin master      # Deploys automatically
 
 ---
 
+## Recent Updates (December 4-5, 2025)
+
+### Josh's Feedback Implementation
+
+#### Phase 6: Visual Refinements (COMPLETE)
+- [x] **Sparklines**: Added unicode sparklines (▂▃▅▇) to both Scenario A and B trend columns
+- [x] **Trend Card Styling**: Matched styling between Scenario A and B (solid cream background, full border)
+- [x] **Removed Repetition**: Eliminated duplicate "Trending high" status from Scenario B forecast block
+- [x] **Simplified Indicators**: Changed pill badges to minimal status dots (●) in hero cards
+- [x] **Text Refinement**: Tightened hero card copy throughout (e.g., "Tier 2 — Growing" → "Tier 2 - Growing")
+- [x] **Visual Weight**: Reduced border weight on hero cards, added subtle shadows
+- [x] **Guardrails Styling**: Made guardrails quieter (11px, lighter color)
+- [x] **Overall Pace**: Reduced size and weight (12px, font-weight 400)
+- [x] **Table Improvements**: Updated "Remaining" column header to "Remaining credits" for clarity
+- [x] **Credits Button**: Added "Add credits" button to Scenario B Other Services section
+
+#### Data Fixes (COMPLETE)
+- [x] Fixed otherServicesCredits calculations in Scenario B mockData
+  - Removed domestic unlimited from credit pool
+  - Adjusted fax allocation (500 → 1000)
+  - Verified all totals sum correctly (5,000 total)
+
+#### Documentation Updates (COMPLETE)
+- [x] Added "Summary of Changes Requested by Josh on Dec 4th 2025" section to Notes page
+- [x] Updated with 10 key principles:
+  1. Reduce visual noise
+  2. Improve clarity of remaining vs used
+  3. Simplify layout and information density
+  4. Replace verbose labels with simple indicators
+  5. Add predictive signals
+  6. Strengthen budgeting and controls
+  7. Consistent treatment across A and B
+  8. Reorganize the hierarchy
+  9. Clarify credit pool behavior
+  10. Avoid documentation-like content
+
+#### Deployment (COMPLETE)
+- [x] Built production bundle
+- [x] Deployed to GitHub Pages
+- [x] Commit: `e85380a` - "Implement Josh's Dec 4th feedback and refinements"
+- [x] All changes live at https://amitdialpad.github.io/daart-billing-prototype/
+
+### Visual Design Philosophy Applied
+
+**Numbers First**: Made "remaining" values dominant throughout both scenarios
+
+**One Primary Signal**: Removed duplicate status indicators, keeping trend banner as single source of truth
+
+**Mechanical Not Narrative**: Shortened interpretation text, removed verbose explanations
+
+**Ledger Feel**: Google Sheets-style tables with light borders, clean typography
+
+**Control Panel Not Report**: Interface feels actionable, not documentary
+
+---
+
 ## Contact & Handoff
 
 **Current Owner**: Amit Ayre
@@ -565,9 +621,9 @@ git push origin master      # Deploys automatically
 **Stakeholders**: Josh, Abby, Ted
 **Meeting**: Thursday, December 5, 2025 (morning)
 
-**Project Status**: ✅ Ready for presentation
+**Project Status**: ✅ Ready for presentation with Josh's refinements applied
 
 ---
 
-**Last Updated**: December 3, 2025, 11:00 AM
+**Last Updated**: December 5, 2025, 8:00 AM
 **Next Update**: After Thursday leadership meeting (Dec 5, 2025)

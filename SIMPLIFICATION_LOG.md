@@ -464,5 +464,181 @@ git push origin master
 
 ---
 
-**Last Updated**: December 3, 2025, 11:00 AM
-**Status**: Deployed to production, all refinements complete
+## Phase 6: Josh's December 4th Feedback Implementation
+
+**Date**: December 4-5, 2025
+**Goal**: Apply visual refinements based on Josh's detailed feedback session
+
+### Issue 13: Visual Consistency - Sparklines
+**Problem**: Scenario B had sparklines, Scenario A didn't
+
+**Changes Made**:
+- **File**: `/src/pages/ScenarioA.vue` (lines 97-99)
+- Added unicode sparklines to Budget Snapshot table:
+  ```vue
+  <td class="td-trend">
+    <span class="sparkline">▂▃▅▇</span> {{ getShortVariance(item, key) }}
+  </td>
+  ```
+- **CSS**: Added sparkline styling (lines 1514-1518)
+
+### Issue 14: Trend Card Styling Mismatch
+**Problem**: Scenario B trend card had gradient/left-border, Scenario A had solid background
+
+**Changes Made**:
+- **File**: `/src/pages/ScenarioB.vue` (lines 1805-1820)
+- Changed from gradient to solid cream background:
+  ```css
+  /* Before */
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, ...);
+  border-left: 3px solid #F59E0B;
+
+  /* After */
+  background-color: #FFFBF0;
+  border: 1px solid #FFE0B2;
+  ```
+- Increased font-size: 14px → 15px
+- Adjusted padding: 12px 16px → 16px 20px
+
+### Issue 15: Status Signal Repetition
+**Problem**: "Trending high" appeared 3 times (trend banner, hero badges, forecast block)
+
+**Josh's Feedback**: "One primary signal" - avoid repetition
+
+**Changes Made**:
+- **File**: `/src/pages/ScenarioB.vue`
+- Phase 1-2: Removed pill badges from hero cards
+- Phase 3: Removed "Trending high" from forecast block (line 52)
+- Result: Single status in trend banner, subtle dots in hero cards
+
+### Issue 16: Hero Card Visual Refinements
+**Problem**: Cards felt too heavy, text was verbose
+
+**Changes Made**:
+- **Phase 1**: Removed pill badges (`.status-badge`)
+- **Phase 2**: Tightened hero card text:
+  - "Tier 2: Growing" → "Tier 2 - Growing" (simple dash)
+  - Added context: "conversations this period"
+  - Shortened: "conversations to Tier 3" → "conversations to next tier"
+- **Phase 6**: Reduced visual weight:
+  - Border: #CCCCCC → #E5E5E5 (lighter)
+  - Added subtle shadow: `box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04)`
+  - CSS adjustments: `.hero-header` align-items: center → baseline
+  - Removed gap: 8px from `.hero-card`
+
+### Issue 17: Other Services Table Refinements
+**Problem**: Column headers unclear, pace line too prominent
+
+**Changes Made**:
+- **Phase 3**: Updated table (lines 62-94)
+  - Column header: "Remaining" → "Remaining credits"
+  - Removed "cr" suffix from values
+  - Overall pace: Removed arrow, simplified to "● High usage trend"
+- **Phase 5**: Made overall pace quieter:
+  - Font-size: 13px → 12px
+  - Font-weight: 500 → 400
+  - Color: explicit #666666
+
+### Issue 18: Guardrails Visual Weight
+**Problem**: Guardrails text felt too prominent
+
+**Changes Made**:
+- **Phase 4**: Made guardrails much quieter
+- **CSS** (lines 1962-1968):
+  - Font-size: 13px → 11px
+  - Color: #888888 → #999999 (lighter)
+  - Font-weight: 400 (explicit)
+
+### Issue 19: Add Credits Button
+**Problem**: Scenario A had "Add credits" button, Scenario B didn't
+
+**Changes Made**:
+- **File**: `/src/pages/ScenarioB.vue`
+- Added button to Other Services header (lines 67-70):
+  ```vue
+  <div class="header-actions">
+    <button class="btn-export" @click="handleAddCredits">Add credits</button>
+    <button class="btn-export" @click="openOtherServicesSettings">Settings</button>
+  </div>
+  ```
+- Added handler function (lines 400-404)
+
+### Issue 20: Mock Data Calculations
+**Problem**: Scenario B otherServicesCredits totals didn't add up
+
+**Error Found**:
+- Allocated: 2500 + 1500 + 500 = 4,500 (should be 5,000)
+- Used: 623 + 411 + 120 = 1,154 (should be 1,234)
+- Domestic unlimited (999999) incorrectly in credit pool
+
+**Fix Applied**:
+- **File**: `/src/data/mockData.js` (lines 666-679)
+- Removed `domestic` from allocation
+- Adjusted `fax.allocated`: 500 → 1,000
+- Adjusted `fax.used`: 120 → 200
+- Added clarifying note about domestic being separate
+- **Result**: All calculations now correct ✓
+
+### Issue 21: Documentation - Josh's Principles
+**Problem**: Need to document Josh's feedback for future reference
+
+**Changes Made**:
+- **File**: `/src/pages/Notes.vue` (lines 519-610)
+- Added "Summary of Changes Requested by Josh on Dec 4th 2025" section
+- Documented 10 key principles:
+  1. Reduce visual noise
+  2. Improve clarity of remaining vs used
+  3. Simplify layout and information density
+  4. Replace verbose labels with simple indicators
+  5. Add predictive signals
+  6. Strengthen budgeting and controls
+  7. Consistent treatment across A and B
+  8. Reorganize the hierarchy
+  9. Clarify credit pool behavior
+  10. Avoid documentation-like content
+
+### Deployment
+**Process**:
+```bash
+npm run build
+rm -rf docs/* && cp -r dist/* docs/
+git add .
+git commit -m "Implement Josh's Dec 4th feedback and refinements"
+git push origin master
+```
+
+**Commit**: `e85380a`
+**Deployment**: Successful to https://amitdialpad.github.io/daart-billing-prototype/
+**Changes Live**: December 5, 2025, 8:00 AM
+
+---
+
+## Summary of All Changes
+
+### Metrics:
+- **Phase 1-5** (Dec 2-3): 23 cards → 11 cards (52% reduction)
+- **Phase 6** (Dec 4-5): Visual refinements, no card count change
+- **Total improvements**: 67% fewer words, 45% less scrolling
+
+### Design Principles Applied:
+✅ One primary signal (no repetition)
+✅ Numbers first (remaining values dominant)
+✅ Mechanical not narrative (terse text)
+✅ Control panel not report (actionable interface)
+✅ Opt into complexity (FAQs collapsed)
+✅ Self-evident UI (no docs needed)
+
+### Files Modified (Phase 6):
+1. `/src/pages/ScenarioA.vue` - Added sparklines, shadow
+2. `/src/pages/ScenarioB.vue` - 6 phases of refinements
+3. `/src/pages/Notes.vue` - Josh's principles documented
+4. `/src/data/mockData.js` - Fixed calculations
+5. `/Users/amitayre/daart-billing/CURRENT_STATE.md` - Updated status
+6. `/Users/amitayre/daart-billing/README.md` - Updated date
+7. `/Users/amitayre/daart-billing/SIMPLIFICATION_LOG.md` - This file
+
+---
+
+**Last Updated**: December 5, 2025, 8:00 AM
+**Status**: Deployed to production, Josh's Dec 4th feedback fully implemented
+**Next**: Thursday leadership meeting presentation
