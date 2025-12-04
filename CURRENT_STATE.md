@@ -1,8 +1,8 @@
 # Current State: Implementation Status
 
-**Last Updated**: December 3, 2025, 4:30 AM
+**Last Updated**: December 3, 2025, 11:00 AM
 **Project**: DAART Billing Prototypes (Scenario A & B)
-**Status**: ✅ Prototype Complete & Simplified
+**Status**: ✅ Deployed & Production Ready
 
 ---
 
@@ -17,7 +17,14 @@ npm run dev
 ### Routes:
 - Scenario A: `http://localhost:3000/daart-billing-prototype/#/scenario-a`
 - Scenario B: `http://localhost:3000/daart-billing-prototype/#/scenario-b`
+- Notes: `http://localhost:3000/daart-billing-prototype/#/notes`
 - Default: Redirects to Scenario A
+
+### Production URL:
+**Live Site**: https://amitdialpad.github.io/daart-billing-prototype/
+- Scenario A: https://amitdialpad.github.io/daart-billing-prototype/#/scenario-a
+- Scenario B: https://amitdialpad.github.io/daart-billing-prototype/#/scenario-b
+- Notes: https://amitdialpad.github.io/daart-billing-prototype/#/notes
 
 ---
 
@@ -67,11 +74,11 @@ npm run dev
 - [x] Tested all interactive elements
 - [x] Verified hot module reload working
 
-### ⏳ Phase 5: Deployment (PENDING)
-- [ ] Build production bundle
-- [ ] Deploy to GitHub Pages
-- [ ] Share URLs with stakeholders
-- [ ] Create demo walkthrough notes
+### ✅ Phase 5: Deployment (COMPLETE)
+- [x] Build production bundle
+- [x] Deploy to GitHub Pages
+- [x] Share URLs with stakeholders
+- [x] Create demo walkthrough notes (Notes page)
 
 ---
 
@@ -93,6 +100,7 @@ daart-billing/
 │   ├── pages/
 │   │   ├── ScenarioA.vue                ✅ Upfront credits page
 │   │   ├── ScenarioB.vue                ✅ Tiered rates page
+│   │   ├── Notes.vue                    ✅ PRD requirements & comparison
 │   │   └── Comparison.vue               ✅ Side-by-side view
 │   ├── router/
 │   │   └── index.js                     ✅ Vue Router config
@@ -240,6 +248,11 @@ Shows SMS/International usage with credit-based billing separate from tiered age
 
 #### 7. Guardrails Note
 Same as Scenario A.
+
+#### 8. Recent Improvements (Dec 3, 2025)
+- **Next Tier Rates Display**: Shows upcoming tier rates below progress bar so users understand benefits of reaching next tier
+- **Inline Conversation Breakdown**: Moved "450 digital, 284 voice" inline with total count for better context
+- **Service Name Consistency**: Fixed all service names to match Scenario A (SMS/MMS, International Calling, Domestic Unlimited Calling, Fax)
 
 ---
 
@@ -447,10 +460,10 @@ Using Dialtone design tokens for consistency:
 - [x] No console errors
 - [x] Mock data complete
 - [x] Simplification complete
-- [ ] Production build tested
-- [ ] GitHub Pages configuration
-- [ ] Custom domain setup (if needed)
-- [ ] Share links prepared
+- [x] Production build tested
+- [x] GitHub Pages configuration (deploys from /docs folder)
+- [x] Share links prepared
+- [x] Notes page with PRD requirements and comparison framework
 
 ### Build Commands:
 ```bash
@@ -469,18 +482,27 @@ npm run deploy
 
 ### Environment:
 - Development: `http://localhost:3000/daart-billing-prototype/`
-- Production: `https://amitdialpad.github.io/daart-billing-prototype/` (when deployed)
+- Production: `https://amitdialpad.github.io/daart-billing-prototype/`
+
+### Deployment Process:
+```bash
+npm run build                # Build to dist/
+cp -r dist/* docs/          # Copy to docs/ for GitHub Pages
+git add docs/
+git commit -m "Update production build"
+git push origin master      # Deploys automatically
+```
 
 ---
 
 ## Next Steps
 
-### Immediate (Before Thursday Meeting):
-1. ⏳ Build production bundle
-2. ⏳ Deploy to GitHub Pages
-3. ⏳ Test deployed URLs
-4. ⏳ Create demo walkthrough document
-5. ⏳ Share links with Josh/Abby
+### Completed (Before Thursday Meeting):
+1. ✅ Build production bundle
+2. ✅ Deploy to GitHub Pages
+3. ✅ Test deployed URLs
+4. ✅ Create demo walkthrough document (Notes page)
+5. ✅ Share links with Josh/Abby
 
 ### During Thursday Meeting (Dec 5):
 - Abby presents prototypes to leadership
@@ -547,5 +569,5 @@ npm run deploy
 
 ---
 
-**Last Updated**: December 3, 2025, 4:30 AM
-**Next Update**: After Thursday leadership meeting
+**Last Updated**: December 3, 2025, 11:00 AM
+**Next Update**: After Thursday leadership meeting (Dec 5, 2025)

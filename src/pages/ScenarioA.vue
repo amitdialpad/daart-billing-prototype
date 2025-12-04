@@ -6,60 +6,103 @@
         <p class="subtitle">Scenario A: Upfront Credits + Budget Allocation</p>
       </div>
 
-      <!-- Credits Overview with Usage Breakdown -->
+      <!-- Trend / Prediction Card - Small, separate, above hero cards -->
+      <div v-if="!isEditingBudget" class="trend-card">
+        Used <strong>${{ data.used.toLocaleString() }}</strong> by day 10 (expected <strong>~$5,000</strong>) · Depletes by <strong>{{ data.forecast.projectedRunOutDate }}</strong> ({{ data.forecast.daysRemaining }} days)
+      </div>
+
+      <!-- Hero Cards - One Money View (State) -->
       <div class="card">
-        <div class="card-row">
-          <div class="credits-main">
-            <div class="credits-large">${{ data.expiration.nonExpiring.toLocaleString() }}</div>
-            <div class="credits-label">Available credits (non-expiring) from ${{ data.totalCredits.toLocaleString() }} total • Renews {{ data.package.renewalDate }} (${{ data.package.totalCost.toLocaleString() }})</div>
-          </div>
-          <div class="credits-actions">
-            <template v-if="isEditingBudget">
-              <button class="btn-secondary" @click="cancelBudgetEdit">Cancel</button>
-              <button class="btn-primary" @click="saveBudgetChanges" :disabled="hasValidationError">Save Changes</button>
-            </template>
-            <template v-else>
-              <button class="btn-secondary" @click="openBudgetSettings">Settings</button>
-              <button class="btn-primary">Add Credits</button>
-            </template>
-          </div>
-        </div>
-
-
-        <div v-if="!isEditingBudget && data.expiration.expiringPercent > 0" class="expiring-warning">
-          <span class="warning-icon">⚠️</span>
-          <span class="warning-text">
-            <strong>${{ data.expiration.expiring.toLocaleString() }}</strong> expires {{ data.expiration.expirationDate }} — use or lose
-            <span class="info-icon-wrapper">
-              <DtIconInfo class="info-icon" />
-              <span class="info-tooltip">Expired credits are lost and cannot be recovered. Use them before expiration or contact your Account Manager to request an extension.</span>
-            </span>
-          </span>
-        </div>
-
-        <div v-if="!isEditingBudget" class="forecast-warning">
-          <span class="forecast-text">
-            At current usage, credits deplete by <strong>{{ data.forecast.projectedRunOutDate }}</strong> ({{ data.forecast.daysRemaining }} days)
-            <span class="info-icon-wrapper">
-              <DtIconInfo class="info-icon" />
-              <span class="info-tooltip">When credits run out, AI Agent services will stop until you add more credits. You'll receive email alerts at 80% usage.</span>
-            </span>
-          </span>
-        </div>
-
-        <div v-if="!isEditingBudget" class="usage-list">
-          <div v-for="(item, key) in data.budgetAllocation" :key="key" class="usage-item">
-            <div class="usage-header">
-              <span class="usage-label">{{ item.label }}</span>
-              <span class="usage-value">{{ item.used.toLocaleString() }}/{{ item.allocated.toLocaleString() }} {{ item.unit }}</span>
+        <div v-if="!isEditingBudget && !isEditingRollover" class="hero-cards-grid">
+          <!-- 1. Total Remaining -->
+          <div class="hero-card hero-card-primary">
+            <div class="hero-header">
+              <span class="hero-label">REMAINING CAPACITY</span>
+              <span class="status-badge status-on-track">On track</span>
             </div>
-            <div class="progress-bar">
-              <div
-                class="progress-fill"
-                :style="{ width: `${Math.min((item.used / item.allocated) * 100, 100)}%` }"
-              ></div>
-            </div>
+            <div class="hero-number">${{ data.available.toLocaleString() }}</div>
+            <div class="hero-interpretation">Credits left before buffer activates</div>
+            <div class="hero-commit">Of ${{ data.totalCredits.toLocaleString() }} monthly commit · Renews {{ data.package.renewalDate }}</div>
+            <button class="hero-action-btn" @click="handleAddCredits">Add credits</button>
           </div>
+
+          <!-- 2. Current Spend -->
+          <div class="hero-card hero-card-primary">
+            <div class="hero-header">
+              <span class="hero-label">CURRENT SPEND</span>
+              <span class="status-badge status-warning">Trending high</span>
+            </div>
+            <div class="hero-number">${{ data.used.toLocaleString() }}</div>
+            <div class="hero-micro-trend">↑ $4,000 over expected pace</div>
+            <div class="hero-interpretation">Ahead of expected for day 10</div>
+            <div class="hero-commit">Month-to-date across all usage</div>
+          </div>
+
+          <!-- 3. Primary Category Budget -->
+          <div class="hero-card">
+            <div class="hero-header">
+              <span class="hero-label">AGENTIC BUDGET</span>
+              <span class="status-badge status-on-track">On track</span>
+            </div>
+            <div class="hero-number">{{ data.budgetAllocation.aiAgentDigital.remaining.toLocaleString() }}</div>
+            <div class="hero-interpretation">Locked rate: 80¢/conversation · ≈ {{ data.budgetAllocation.aiAgentDigital.remaining.toLocaleString() }} conversations remaining</div>
+            <div class="hero-commit">Of {{ data.budgetAllocation.aiAgentDigital.allocated.toLocaleString() }} allocated · On track for month-end</div>
+          </div>
+
+          <!-- 4. Expiring Credits Alert -->
+          <div class="hero-card" v-if="data.expiration.expiring > 0">
+            <div class="hero-header">
+              <span class="hero-label">EXPIRING CREDITS</span>
+              <span class="status-badge status-alert">Expires soon</span>
+            </div>
+            <div class="hero-number">${{ data.expiration.expiring.toLocaleString() }}</div>
+            <div class="hero-interpretation">One-time credits · <strong>27 days</strong> remaining</div>
+            <div class="hero-sequencing">Used only after monthly credits run out.</div>
+            <div class="hero-commit">
+              Expires {{ data.expiration.expirationDate }}
+              <span class="info-icon-wrapper">
+                <DtIconInfo class="info-icon" />
+                <span class="info-tooltip">Expired credits are lost and cannot be recovered. Use them before expiration or contact your Account Manager to request an extension.</span>
+              </span>
+            </div>
+            <button class="hero-action-btn" @click="openRolloverSettings">Manage rollover</button>
+          </div>
+        </div>
+
+        <!-- Budget Snapshot - Full Width -->
+        <div v-if="!isEditingBudget && !isEditingRollover" class="budget-snapshot-full">
+          <div class="budget-snapshot-header">
+            <div class="budget-header-left">
+              <h3>Budget snapshot</h3>
+              <span class="overall-trend">Overall pace: ↑ High usage trend</span>
+            </div>
+            <button class="btn-export" @click="openBudgetSettings">Adjust allocation</button>
+          </div>
+
+          <table class="budget-table-ledger">
+            <thead>
+              <tr>
+                <th class="th-category">Category</th>
+                <th class="th-alloc-used">Alloc/Used</th>
+                <th class="th-remaining">Remaining</th>
+                <th class="th-trend">Trend</th>
+                <th class="th-status">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, key) in data.budgetAllocation" :key="key" class="budget-row">
+                <td class="td-category">{{ item.label }}</td>
+                <td class="td-alloc-used">{{ item.allocated.toLocaleString() }} · {{ item.used.toLocaleString() }} used</td>
+                <td class="td-remaining">${{ item.remaining.toLocaleString() }}</td>
+                <td class="td-trend">
+                  <span class="sparkline">▂▃▅▇</span> {{ getShortVariance(item, key) }}
+                </td>
+                <td class="td-status">
+                  <span class="status-dot" :class="getStatusClass(item)">●</span> {{ getStatusText(item) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div v-else class="allocation-grid">
@@ -101,10 +144,157 @@
             ⚠️ You're over-allocated by {{ Math.abs(remainingUnallocated).toLocaleString() }} credits
           </div>
         </div>
+
+        <div v-if="isEditingBudget" class="edit-actions">
+          <button class="btn-secondary" @click="cancelBudgetEdit">Cancel</button>
+          <button class="btn-primary" @click="saveBudgetChanges" :disabled="hasValidationError">Save Changes</button>
+        </div>
+
+        <!-- Rollover Settings Panel -->
+        <div v-if="isEditingRollover" class="rollover-settings-panel">
+          <div class="rollover-header">
+            <h2>Manage rollover</h2>
+            <p class="rollover-subtitle">Control how renewing credits, one-time credits, and auto-top-ups behave</p>
+          </div>
+
+          <!-- Section 1: Consumption Order -->
+          <div class="rollover-section">
+            <h3 class="rollover-section-title">Consumption order</h3>
+            <div class="rollover-radio-group">
+              <label class="rollover-radio-label">
+                <input type="radio" v-model="editableRollover.consumptionOrder" value="renewing-first" />
+                <span>Use renewing credits first</span>
+              </label>
+              <label class="rollover-radio-label">
+                <input type="radio" v-model="editableRollover.consumptionOrder" value="onetime-first" />
+                <span>Use one-time credits first</span>
+              </label>
+            </div>
+            <p class="rollover-help-text">One-time credits are used only after your monthly renewing pool is exhausted.</p>
+          </div>
+
+          <!-- Section 2: Auto-Renew -->
+          <div class="rollover-section">
+            <h3 class="rollover-section-title">Auto-renew (optional)</h3>
+            <div class="rollover-input-row">
+              <label class="rollover-input-label">
+                Auto top-up when renewing credits fall below:
+                <input
+                  type="number"
+                  v-model.number="editableRollover.autoRenew.threshold"
+                  :disabled="!editableRollover.autoRenew.enabled"
+                  class="rollover-input"
+                  placeholder="500"
+                />
+              </label>
+              <label class="rollover-input-label">
+                Top-up amount:
+                <input
+                  type="number"
+                  v-model.number="editableRollover.autoRenew.topUpAmount"
+                  :disabled="!editableRollover.autoRenew.enabled"
+                  class="rollover-input"
+                  placeholder="5000"
+                />
+              </label>
+            </div>
+            <div class="rollover-radio-group">
+              <label class="rollover-checkbox-label">
+                <input type="checkbox" v-model="editableRollover.autoRenew.enabled" />
+                <span>Enable auto-renew</span>
+              </label>
+              <label class="rollover-radio-label">
+                <input
+                  type="radio"
+                  v-model="editableRollover.autoRenew.alertBeforeRenew"
+                  :value="true"
+                  :disabled="!editableRollover.autoRenew.enabled"
+                />
+                <span>Send alert before auto-renew</span>
+              </label>
+              <label class="rollover-radio-label">
+                <input
+                  type="radio"
+                  v-model="editableRollover.autoRenew.alertBeforeRenew"
+                  :value="false"
+                  :disabled="!editableRollover.autoRenew.enabled"
+                />
+                <span>Auto-renew silently</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 3: One-Time Credit Expiration -->
+          <div class="rollover-section">
+            <h3 class="rollover-section-title">One-time credit expiration</h3>
+            <div class="rollover-info-row">
+              <div class="rollover-info-item">
+                <span class="rollover-info-label">Current one-time balance:</span>
+                <span class="rollover-info-value">${{ data.expiration.expiring.toLocaleString() }}</span>
+              </div>
+              <div class="rollover-info-item">
+                <span class="rollover-info-label">Expiration date:</span>
+                <span class="rollover-info-value">{{ data.expiration.expirationDate }} ({{ data.forecast.daysRemaining }} days left)</span>
+              </div>
+            </div>
+            <p class="rollover-subsection-label">Expiration alerts:</p>
+            <div class="rollover-checkbox-group">
+              <label class="rollover-checkbox-label">
+                <input type="checkbox" v-model="editableRollover.expirationAlerts.thirtyDays" />
+                <span>30 days before</span>
+              </label>
+              <label class="rollover-checkbox-label">
+                <input type="checkbox" v-model="editableRollover.expirationAlerts.sevenDays" />
+                <span>7 days before</span>
+              </label>
+              <label class="rollover-checkbox-label">
+                <input type="checkbox" v-model="editableRollover.expirationAlerts.dayOf" />
+                <span>Day of expiration</span>
+              </label>
+            </div>
+            <button class="rollover-learn-link" @click="showPoolExplanation = !showPoolExplanation">
+              {{ showPoolExplanation ? '− Hide explanation' : '+ Learn how credit pools work' }}
+            </button>
+            <div v-if="showPoolExplanation" class="rollover-explanation">
+              <p>Renewing credits refill monthly and are used first.</p>
+              <p>One-time credits are a backup pool that expire after 30 days.</p>
+              <p>Your auto-renew and fallback settings control how they interact.</p>
+            </div>
+          </div>
+
+          <!-- Section 4: Exhaustion Fallback -->
+          <div class="rollover-section">
+            <h3 class="rollover-section-title">Exhaustion fallback</h3>
+            <p class="rollover-subsection-label">When both pools reach zero:</p>
+            <div class="rollover-radio-group">
+              <label class="rollover-radio-label">
+                <input type="radio" v-model="editableRollover.exhaustionFallback" value="block" />
+                <span>Block usage</span>
+              </label>
+              <label class="rollover-radio-label">
+                <input type="radio" v-model="editableRollover.exhaustionFallback" value="overage" />
+                <span>Allow usage and bill at overage rates (if supported)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Validation Errors -->
+          <div v-if="rolloverValidationErrors.length > 0" class="rollover-errors">
+            <div v-for="(error, index) in rolloverValidationErrors" :key="index" class="rollover-error">
+              {{ error }}
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="edit-actions">
+            <button class="btn-secondary" @click="cancelRolloverEdit">Cancel</button>
+            <button class="btn-primary" @click="saveRolloverChanges" :disabled="hasRolloverValidationError">Save changes</button>
+          </div>
+        </div>
       </div>
 
       <!-- Usage History -->
-      <div v-if="!isEditingBudget" class="card">
+      <div v-if="!isEditingBudget && !isEditingRollover" class="card">
         <h2>Usage History</h2>
 
         <div class="history-controls">
@@ -158,7 +348,10 @@
               </td>
               <td class="text-secondary">
                 {{ entry.duration }}
-                <span v-if="entry.rechargeApplied" class="recharge-badge" :title="entry.rechargeReason">2×</span>
+                <span v-if="entry.rechargeApplied" class="recharge-badge-wrapper">
+                  <span class="recharge-badge">2×</span>
+                  <span class="recharge-tooltip">{{ entry.rechargeReason }}</span>
+                </span>
               </td>
               <td class="text-right">
                 <span v-if="entry.listPrice">${{ entry.listPrice }}</span>
@@ -177,7 +370,7 @@
       </div>
 
       <!-- Team Consumption Summary -->
-      <div v-if="!isEditingBudget" class="card">
+      <div v-if="!isEditingBudget && !isEditingRollover" class="card">
         <div class="summary-header-row">
           <div>
             <h2>Agent Consumption</h2>
@@ -227,7 +420,7 @@
       </div>
 
       <!-- Usage Alerts -->
-      <div v-if="!isEditingBudget" class="card">
+      <div v-if="!isEditingBudget && !isEditingRollover" class="card">
         <h2>Usage Alerts</h2>
         <p class="section-subtitle">Email alerts at first threshold • Services stop at second threshold</p>
 
@@ -254,7 +447,7 @@
       </div>
 
       <!-- FAQ -->
-      <div v-if="!isEditingBudget" class="card">
+      <div v-if="!isEditingBudget && !isEditingRollover" class="card">
         <h2>Frequently Asked Questions</h2>
 
         <div class="faq-list">
@@ -366,6 +559,65 @@ const saveBudgetChanges = () => {
   isEditingBudget.value = false
 }
 
+// Rollover settings editing
+const isEditingRollover = ref(false)
+const editableRollover = ref({})
+const showPoolExplanation = ref(false)
+
+const openRolloverSettings = () => {
+  // Create a deep copy of current rollover settings for editing
+  editableRollover.value = JSON.parse(JSON.stringify(data.value.rolloverSettings))
+  isEditingRollover.value = true
+}
+
+const cancelRolloverEdit = () => {
+  isEditingRollover.value = false
+  editableRollover.value = {}
+  showPoolExplanation.value = false
+}
+
+const saveRolloverChanges = () => {
+  // Update the actual data
+  data.value.rolloverSettings = JSON.parse(JSON.stringify(editableRollover.value))
+  isEditingRollover.value = false
+  showPoolExplanation.value = false
+}
+
+const handleAddCredits = () => {
+  // Placeholder for Add Credits functionality
+  console.log('Add credits clicked')
+  // TODO: Implement add credits flow
+}
+
+// Rollover validation
+const rolloverValidationErrors = computed(() => {
+  if (!isEditingRollover.value) return []
+
+  const errors = []
+  const settings = editableRollover.value
+
+  // Validate threshold
+  if (settings.autoRenew.enabled) {
+    if (settings.autoRenew.threshold >= data.value.available) {
+      errors.push('Threshold must be lower than your monthly credit pool')
+    }
+    if (settings.autoRenew.threshold < 0) {
+      errors.push('Threshold must be $0 or greater')
+    }
+
+    // Validate top-up amount
+    if (settings.autoRenew.topUpAmount <= 0) {
+      errors.push('Top-up amount must be greater than $0')
+    }
+  }
+
+  return errors
+})
+
+const hasRolloverValidationError = computed(() => {
+  return rolloverValidationErrors.value.length > 0
+})
+
 // Validation
 const totalAllocated = computed(() => {
   if (!isEditingBudget.value) return 0
@@ -412,6 +664,202 @@ const getTrendSymbol = (member) => {
   if (percent > 5) return '↑ '
   if (percent < -5) return '↓ '
   return ''
+}
+
+// Calculate ring progress for SVG circle
+const getRingProgress = (used, total, radius) => {
+  const circumference = 2 * Math.PI * radius // Total circle length
+  const percentage = (used / total) * 100
+  const progress = (percentage / 100) * circumference
+
+  // Return as "progress remaining" format for stroke-dasharray
+  return `${progress} ${circumference}`
+}
+
+// Get category color (Apple Watch style)
+const getCategoryColor = (key) => {
+  const colors = {
+    aiAgentDigital: '#FF3B30', // Red
+    aiAgentVoice: '#FF6B6B',   // Light Red
+    sms: '#34C759',            // Green
+    international: '#007AFF',   // Blue
+    fax: '#FF9500'             // Orange
+  }
+  return colors[key] || '#666666'
+}
+
+// Calculate status based on usage trend
+const getStatusClass = (item) => {
+  const percentUsed = (item.used / item.allocated) * 100
+
+  // Simple heuristic: if used > 50% and remaining is low, show warning
+  if (percentUsed >= 80) return 'status-over'
+  if (percentUsed >= 60) return 'status-warning'
+  return 'status-on-track'
+}
+
+const getStatusText = (item) => {
+  const percentUsed = (item.used / item.allocated) * 100
+
+  if (percentUsed >= 80) return 'Over budget'
+  if (percentUsed >= 60) return 'Projected over'
+  return 'On track'
+}
+
+const getStatusIcon = (item) => {
+  const percentUsed = (item.used / item.allocated) * 100
+
+  if (percentUsed >= 80) return '●'
+  if (percentUsed >= 60) return '▲'
+  return '✓'
+}
+
+// Get projection text
+const getProjectionText = (item, key) => {
+  const percentUsed = (item.used / item.allocated) * 100
+
+  if (percentUsed >= 80) {
+    return 'At current pace: will deplete soon'
+  } else if (percentUsed >= 60) {
+    return 'At current pace: may exceed by month end'
+  } else {
+    const projectedRemaining = Math.round(item.remaining * 0.7) // Rough estimate
+    return `Projected: ${projectedRemaining.toLocaleString()} remaining at month end`
+  }
+}
+
+// Get context text (what credits mean in real terms)
+const getContextText = (item, key) => {
+  switch(key) {
+    case 'aiAgentDigital':
+    case 'aiAgentVoice':
+      return `≈ ${item.remaining.toLocaleString()} conversations`
+    case 'sms':
+      const messagesPerCredit = 20 // Rough estimate
+      return `≈ ${(item.remaining * messagesPerCredit).toLocaleString()} messages`
+    case 'international':
+      const avgCallMinutes = 8
+      const callsEstimate = Math.round(item.remaining / avgCallMinutes)
+      return `≈ ${callsEstimate} calls (avg ${avgCallMinutes} min)`
+    case 'fax':
+      return `≈ ${item.remaining.toLocaleString()} pages`
+    default:
+      return `${item.remaining.toLocaleString()} ${item.unit} remaining`
+  }
+}
+
+// Get daily trend text for current spend card
+const getDailyTrendText = () => {
+  // Assume we're on day 10 of a 30-day month for demo
+  const currentDay = 10
+  const daysInMonth = 30
+  const expectedSpendByNow = (data.value.totalCredits / daysInMonth) * currentDay
+  const actualSpend = data.value.used
+
+  if (actualSpend > expectedSpendByNow * 1.15) {
+    return `You're ahead of expected usage for day ${currentDay} of the cycle.`
+  } else if (actualSpend < expectedSpendByNow * 0.85) {
+    return `You're below expected usage for day ${currentDay} of the cycle.`
+  }
+  return `On track with expected usage for day ${currentDay} of the cycle.`
+}
+
+// Get expected vs actual comparison text
+const getExpectedVsActualText = () => {
+  // Assume we're on day 10 of a 30-day month
+  const currentDay = 10
+  const daysInMonth = 30
+  const expectedSpendByNow = Math.round((data.value.totalCredits / daysInMonth) * currentDay)
+  const actualSpend = data.value.used
+
+  return `By today you'd ideally have used about $${expectedSpendByNow.toLocaleString()}. You've used $${actualSpend.toLocaleString()}.`
+}
+
+// Get sparkline for budget item (tiny inline chart)
+// Get percentage for bar chart
+const getPercentage = (value, total) => {
+  if (total === 0) return 0
+  return Math.round((value / total) * 100)
+}
+
+// Get unit interpretation for budget items
+const getUnitInterpretation = (item, key) => {
+  switch(key) {
+    case 'aiAgentDigital':
+    case 'aiAgentVoice':
+      return `≈ ${item.remaining.toLocaleString()} conversations remaining this month`
+    case 'sms':
+      const messagesPerCredit = 20 // Rough estimate
+      return `≈ ${(item.remaining * messagesPerCredit).toLocaleString()} messages remaining`
+    case 'international':
+      const avgCallMinutes = 8
+      const callsEstimate = Math.round(item.remaining / avgCallMinutes)
+      return `≈ ${callsEstimate} calls remaining (avg ${avgCallMinutes} min)`
+    case 'fax':
+      return `≈ ${item.remaining.toLocaleString()} pages remaining`
+    case 'domestic':
+      return `Unlimited calling`
+    default:
+      return `${item.remaining.toLocaleString()} ${item.unit} remaining`
+  }
+}
+
+// Get variance text (ahead/behind expected)
+const getVarianceText = (item, key) => {
+  const currentDay = 10
+  const daysInMonth = 30
+  const expectedUsedByNow = (item.allocated / daysInMonth) * currentDay
+  const actualUsed = item.used
+  const variance = actualUsed - expectedUsedByNow
+
+  if (Math.abs(variance) < item.allocated * 0.05) {
+    // Within 5% - on track
+    return `On track with expected usage for day ${currentDay}`
+  } else if (variance > 0) {
+    // Ahead (using more than expected)
+    return `↑ ahead by ${Math.round(variance).toLocaleString()} vs expected for day ${currentDay}`
+  } else {
+    // Behind (using less than expected)
+    return `↓ under by ${Math.abs(Math.round(variance)).toLocaleString()} vs expected for day ${currentDay}`
+  }
+}
+
+// Get SHORT unit interpretation for compact ledger view
+const getShortUnitInterpretation = (item, key) => {
+  switch(key) {
+    case 'aiAgentDigital':
+    case 'aiAgentVoice':
+      return `≈ ${item.remaining.toLocaleString()} conv`
+    case 'sms':
+      const msgs = item.remaining * 20
+      return `≈ ${msgs.toLocaleString()} msgs`
+    case 'international':
+      const calls = Math.round(item.remaining / 8)
+      return `≈ ${calls} calls`
+    case 'fax':
+      return `≈ ${item.remaining.toLocaleString()} pages`
+    case 'domestic':
+      return `Unlimited`
+    default:
+      return `${item.remaining.toLocaleString()} ${item.unit}`
+  }
+}
+
+// Get SHORT variance for compact ledger view
+const getShortVariance = (item, key) => {
+  const currentDay = 10
+  const daysInMonth = 30
+  const expectedUsedByNow = (item.allocated / daysInMonth) * currentDay
+  const actualUsed = item.used
+  const variance = actualUsed - expectedUsedByNow
+
+  if (Math.abs(variance) < item.allocated * 0.05) {
+    return `On track`
+  } else if (variance > 0) {
+    return `↑${Math.round(variance)}`
+  } else {
+    return `↓${Math.abs(Math.round(variance))}`
+  }
 }
 
 // Find biggest spike for alert
@@ -810,24 +1258,331 @@ h2 {
   margin-bottom: 24px;
 }
 
-.usage-item {
+/* Hero Cards Grid */
+.hero-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 1024px) {
+  .hero-cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.hero-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-.usage-header {
+/* Primary hero cards - higher visual priority */
+.hero-card-primary {
+  padding: 24px;
+}
+
+.hero-card-primary .hero-label {
+  font-size: 12px;
+  letter-spacing: 0.6px;
+}
+
+.hero-card-primary .hero-number {
+  font-size: 44px;
+}
+
+.hero-header {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  align-items: baseline;
+  margin-bottom: 8px;
 }
 
-.usage-label {
+.hero-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666666;
+}
+
+.hero-number {
+  font-size: 40px;
+  font-weight: 600;
+  color: #1C1C1C;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.hero-micro-trend {
+  font-size: 11px;
+  font-weight: 500;
+  color: #666666;
+  margin-top: 4px;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.hero-context {
+  font-size: 14px;
+  color: #535353;
+  font-weight: 500;
+}
+
+.hero-helper {
+  font-size: 13px;
+  color: #888888;
+  line-height: 1.4;
+}
+
+/* Status Badges */
+.status-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.status-on-track {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-warning {
+  background-color: #FFF8E1;
+  color: #F57C00;
+}
+
+.status-over {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+.status-alert {
+  background-color: #E3F2FD;
+  color: #1976D2;
+}
+
+/* Status Dots (for table) */
+.status-dot {
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.status-dot.status-on-track {
+  color: #10B981;
+}
+
+.status-dot.status-warning {
+  color: #F59E0B;
+}
+
+.status-dot.status-over {
+  color: #EF4444;
+}
+
+/* Trend Card - Small, calm, separate */
+.trend-card {
+  background-color: #FFFBF0;
+  border: 1px solid #FFE0B2;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #1C1C1C;
+  line-height: 1.4;
+}
+
+.trend-card strong {
+  font-weight: 700;
+  color: #1C1C1C;
+}
+
+.trend-line-3 strong {
+  color: #1C1C1C;
   font-weight: 600;
 }
 
-.usage-value {
+/* Hero Card Interpretation Layers */
+.hero-interpretation {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1C1C1C;
+  margin-top: 8px;
+  line-height: 1.4;
+}
+
+.hero-sequencing {
+  font-size: 13px;
+  font-weight: 400;
   color: #666666;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.hero-commit {
+  font-size: 12px;
+  color: #888888;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.hero-action-btn {
+  margin-top: 12px;
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #1C1C1C;
+  transition: all 0.2s ease;
+}
+
+.hero-action-btn:hover {
+  background-color: #F9F9F9;
+  border-color: #999999;
+}
+
+/* Budget Snapshot Enhanced - Ledger feel */
+.budget-list-enhanced {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Budget Snapshot - Table Ledger */
+.budget-table-ledger {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.budget-table-ledger thead {
+  border-bottom: 1px solid #eee;
+}
+
+.budget-table-ledger th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+}
+
+.budget-table-ledger tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+.budget-table-ledger td {
+  padding: 12px;
+  font-size: 14px;
+  color: #1C1C1C;
+  vertical-align: middle;
+}
+
+/* Category column */
+.td-category {
+  font-weight: 600;
+}
+
+/* Alloc/Used column */
+.td-alloc-used {
+  color: #666666;
+}
+
+/* Remaining column - HERO NUMBER */
+.td-remaining {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Trend column */
+.td-trend {
+  color: #666666;
+}
+
+.sparkline {
+  font-size: 12px;
+  margin-right: 4px;
+  color: #888888;
+}
+
+/* Status column */
+.td-status {
+  white-space: nowrap;
+}
+
+/* Budget Snapshot Full Width */
+.budget-snapshot-full {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.budget-snapshot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.budget-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.budget-snapshot-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin: 0;
+}
+
+.overall-trend {
+  font-size: 13px;
+  color: #666;
+}
+
+.budget-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #1976D2;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+.budget-snapshot-subtitle {
+  font-size: 13px;
+  color: #666666;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
 .allocation-grid {
@@ -974,6 +1729,14 @@ h2 {
   font-size: 14px;
   font-weight: 500;
   border-radius: 4px;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
 }
 
 .progress-bar {
@@ -1138,6 +1901,12 @@ h2 {
   color: #888888;
 }
 
+.recharge-badge-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 4px;
+}
+
 .recharge-badge {
   display: inline-block;
   padding: 2px 4px;
@@ -1145,8 +1914,40 @@ h2 {
   color: #FFFFFF;
   border-radius: 3px;
   font-size: 10px;
-  margin-left: 4px;
   cursor: help;
+}
+
+.recharge-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+.recharge-badge-wrapper:hover .recharge-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.recharge-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333;
 }
 
 .history-note {
@@ -1744,5 +2545,233 @@ h2 {
 
 .trend-value.flat {
   color: #666666;
+}
+
+/* Rollover Settings Panel */
+.rollover-settings-panel {
+}
+
+.rollover-header {
+}
+
+.rollover-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin: 0 0 8px 0;
+}
+
+.rollover-subtitle {
+  font-size: 14px;
+  color: #666666;
+  margin: 0;
+}
+
+.rollover-section {
+  padding: 24px 0;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.rollover-section:last-of-type {
+  border-bottom: none;
+}
+
+.rollover-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin: 0 0 16px 0;
+}
+
+.rollover-subsection-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1C1C1C;
+  margin: 16px 0 12px 0;
+}
+
+.rollover-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rollover-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #1C1C1C;
+  cursor: pointer;
+}
+
+.rollover-radio-label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.rollover-radio-label input[type="radio"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rollover-radio-label:has(input:disabled) span {
+  opacity: 0.5;
+}
+
+.rollover-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rollover-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #1C1C1C;
+  cursor: pointer;
+}
+
+.rollover-checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.rollover-help-text {
+  font-size: 13px;
+  color: #666666;
+  margin: 12px 0 0 0;
+  line-height: 1.5;
+}
+
+.rollover-input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.rollover-input-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: #1C1C1C;
+  font-weight: 500;
+}
+
+.rollover-input {
+  padding: 10px 14px;
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+  background-color: #FFFFFF;
+}
+
+.rollover-input:hover:not(:disabled) {
+  border-color: #999999;
+}
+
+.rollover-input:focus {
+  outline: none;
+  border-color: #6B46EE;
+  box-shadow: 0 0 0 3px rgba(107, 70, 238, 0.08);
+}
+
+.rollover-input:disabled {
+  background-color: #F5F5F5;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+.rollover-info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #F9F9F9;
+  border-radius: 6px;
+}
+
+.rollover-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rollover-info-label {
+  font-size: 12px;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.rollover-info-value {
+  font-size: 16px;
+  color: #1C1C1C;
+  font-weight: 600;
+}
+
+.rollover-learn-link {
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: #1976D2;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.rollover-learn-link:hover {
+  text-decoration: underline;
+}
+
+.rollover-explanation {
+  margin-top: 12px;
+  padding: 16px;
+  background-color: #F3F3FF;
+  border-left: 4px solid #6B46EE;
+  border-radius: 4px;
+}
+
+.rollover-explanation p {
+  font-size: 13px;
+  color: #1C1C1C;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+}
+
+.rollover-explanation p:last-child {
+  margin-bottom: 0;
+}
+
+.rollover-errors {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #FFF5F5;
+  border-left: 4px solid #E52C2C;
+  border-radius: 4px;
+}
+
+.rollover-error {
+  font-size: 14px;
+  color: #E52C2C;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.rollover-error:last-child {
+  margin-bottom: 0;
 }
 </style>

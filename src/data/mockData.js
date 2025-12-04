@@ -49,7 +49,7 @@ export const mockData = {
     pricePerCredit: 1.00,  // 1 credit = $1
     discountPercent: 20,
     discountApplied: 'upfront', // Discount given at purchase time, not consumption
-    nextBilling: 'Nov 26, 2025',
+    nextBilling: 'Jan 1, 2026',
     minimumCommitment: 10000, // Enterprise-focused: 10K+ credits minimum at launch
 
     // AI Agent counts per team
@@ -88,10 +88,10 @@ export const mockData = {
 
     // Forecasted Usage
     forecast: {
-      projectedRunOutDate: 'Jan 15, 2026',
-      daysRemaining: 45,
-      averageDailyBurn: 195,
-      description: 'Based on current usage patterns, credits will be depleted by Jan 15, 2026'
+      projectedRunOutDate: 'Dec 20, 2025',
+      daysRemaining: 16,
+      averageDailyBurn: 375,
+      description: 'Based on current usage patterns, credits will be depleted by Dec 20, 2025'
     },
 
     // Billable Criteria (What makes a conversation billable)
@@ -113,7 +113,7 @@ export const mockData = {
     package: {
       name: 'Credit Package',
       totalCost: 12000,  // $12,000 for 15,000 credits (20% discount from $15,000)
-      renewalDate: 'Nov 26, 2025',
+      renewalDate: 'Jan 1, 2026',
       originalValue: 15000,
       discountAmount: 3000,
       discountPercent: 20
@@ -124,8 +124,8 @@ export const mockData = {
       name: 'AI Conversations credits',
       creditAmount: 12000,  // 12,000 credits allocated for agentic
       totalCredits: 15000,
-      renewalDate: 'Nov 26, 2025',
-      description: '$12,000.00 Credit Package (12000 AI Conversations credits) will renew on Nov 26, 2025'
+      renewalDate: 'Jan 1, 2026',
+      description: '$12,000.00 Credit Package (12000 AI Conversations credits) will renew on Jan 1, 2026'
     },
 
     // Credit Expiration
@@ -136,6 +136,23 @@ export const mockData = {
       expiringPercent: 32,
       expirationDate: 'Dec 31, 2025',
       policy: 'Use-it-or-lose-it: Credits expire at billing cycle end'
+    },
+
+    // Rollover Settings
+    rolloverSettings: {
+      consumptionOrder: 'renewing-first', // 'renewing-first' | 'onetime-first'
+      autoRenew: {
+        enabled: false,
+        threshold: 500,
+        topUpAmount: 5000,
+        alertBeforeRenew: true
+      },
+      expirationAlerts: {
+        thirtyDays: true,
+        sevenDays: true,
+        dayOf: false
+      },
+      exhaustionFallback: 'block' // 'block' | 'overage'
     },
 
     // Effective Rates (base rate × discount)
@@ -153,52 +170,44 @@ export const mockData = {
       message: 'Rates are locked and cannot be custom-discounted by Deal Desk'
     },
 
-    // Budget Allocation across usage types
+    // Budget Allocation across usage types (excludes domestic unlimited)
     budgetAllocation: {
       aiAgentDigital: {
         allocated: 7000,
-        used: 3000,
-        remaining: 4000,
+        used: 4000,
+        remaining: 3000,
         label: 'AI Agent (Digital)',
         unit: 'AI Conversations credits',
         unitType: 'conversations'
       },
       aiAgentVoice: {
-        allocated: 7000,
+        allocated: 6000,
         used: 3500,
-        remaining: 3500,
+        remaining: 2500,
         label: 'AI Agent (Voice)',
         unit: 'AI Conversations credits',
         unitType: 'conversations'
       },
       sms: {
-        allocated: 2000,
-        used: 1500,
-        remaining: 500,
+        allocated: 1000,
+        used: 800,
+        remaining: 200,
         label: 'SMS/MMS',
         unit: 'messages',
         unitType: 'messages'
       },
       international: {
-        allocated: 1000,
-        used: 800,
-        remaining: 200,
+        allocated: 600,
+        used: 500,
+        remaining: 100,
         label: 'International Calling',
         unit: 'minutes',
         unitType: 'minutes'
       },
-      domestic: {
-        allocated: 999999,
-        used: 4520,
-        remaining: 995480,
-        label: 'Domestic Unlimited Calling',
-        unit: 'minutes',
-        unitType: 'minutes'
-      },
       fax: {
-        allocated: 500,
+        allocated: 400,
         used: 200,
-        remaining: 300,
+        remaining: 200,
         label: 'Fax',
         unit: 'pages',
         unitType: 'pages'
@@ -654,7 +663,8 @@ export const mockData = {
       }
     },
 
-    // === SMS/INTERNATIONAL/TOLL-FREE/FAX/DOMESTIC (Credits - Existing Model) ===
+    // === SMS/INTERNATIONAL/TOLL-FREE/FAX (Credits - Existing Model) ===
+    // Note: Domestic Unlimited Calling is NOT part of the credit pool
     otherServicesCredits: {
       totalCredits: 5000,
       used: 1234,
@@ -662,11 +672,10 @@ export const mockData = {
       allocation: {
         sms: { allocated: 2500, used: 623, remaining: 1877 },
         international: { allocated: 1500, used: 411, remaining: 1089 },
-        fax: { allocated: 500, used: 120, remaining: 380 },
-        domestic: { allocated: 999999, used: 4520, remaining: 995479 }  // Unlimited plan
+        fax: { allocated: 1000, used: 200, remaining: 800 }
       },
       renewalDate: 'Jan 1, 2026',
-      note: 'SMS, International, Fax, and Domestic services continue using credit-based billing'
+      note: 'SMS, International, and Fax services continue using credit-based billing. Domestic calling is billed separately as unlimited.'
     },
 
     // Rate Lock Policy

@@ -254,6 +254,236 @@
         </div>
 
         <div class="page-section">
+          <h2>Scenario Comparison & Decision Framework</h2>
+
+          <h3>Detailed Comparison</h3>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Dimension</th>
+                  <th>Scenario A: Unified Credits</th>
+                  <th>Scenario B: Dynamic Tiered Rates</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Predictability</strong></td>
+                  <td>
+                    <strong>Low</strong><br>
+                    • Shared pool across usage types<br>
+                    • Cannot estimate "X credits = N conversations"<br>
+                    • No accurate cost per agent in Agent Builder
+                  </td>
+                  <td>
+                    <strong>High</strong><br>
+                    • Fixed rates per tier and usage type<br>
+                    • Accurate cost estimates<br>
+                    • Clear cost-per-conversation pricing
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>2. Flexibility</strong></td>
+                  <td>
+                    <strong>High</strong><br>
+                    • Allocate/reallocate credits freely<br>
+                    • Universal credit pool<br>
+                    • Works across all services
+                  </td>
+                  <td>
+                    <strong>Lower</strong><br>
+                    • No credit reallocation<br>
+                    • No cross-service sharing<br>
+                    • Fixed rate structure
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>3. UI Complexity</strong></td>
+                  <td>
+                    <strong>Higher</strong><br>
+                    • Budget allocation UI required<br>
+                    • Per-type limit settings<br>
+                    • Reallocation controls
+                  </td>
+                  <td>
+                    <strong>Lower</strong><br>
+                    • Tier progress visualization<br>
+                    • Spend limit setting<br>
+                    • No allocation needed
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>4. Customer Mental Model</strong></td>
+                  <td>
+                    <strong>More Complex</strong><br>
+                    • Must understand pooling & allocation<br>
+                    • Steeper learning curve
+                  </td>
+                  <td>
+                    <strong>Simpler</strong><br>
+                    • Like cell phone plans<br>
+                    • Familiar tiered discount model
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>5. Multi-Product Alignment</strong></td>
+                  <td>
+                    <strong>Perfect</strong><br>
+                    • Single credit pool for all services<br>
+                    • Unified billing view<br>
+                    • Natural enterprise fit
+                  </td>
+                  <td>
+                    <strong>Requires Extension</strong><br>
+                    • Dual pricing models<br>
+                    • SMS/Intl remain credit-based<br>
+                    • Two systems to explain
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>6. Discounting Strategy</strong></td>
+                  <td>
+                    • Flat discount on purchase<br>
+                    • Low flexibility<br>
+                    • Upfront volume incentive only
+                  </td>
+                  <td>
+                    • Progressive volume discounts<br>
+                    • High flexibility<br>
+                    • Ongoing usage motivation
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>7. Alerts & Limits</strong></td>
+                  <td>
+                    • Per-type budget alerts<br>
+                    • Soft/hard limits<br>
+                    • High granularity
+                  </td>
+                  <td>
+                    • Single monthly spend limit<br>
+                    • Overall spend tracking<br>
+                    • Lower granularity
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Pros & Cons Summary</h3>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 50%">Scenario A: Unified Credits</th>
+                  <th style="width: 50%">Scenario B: Dynamic Tiered Rates</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Pros:</strong><br>
+                    • Simple unified credit pool<br>
+                    • Works across all Dialpad services<br>
+                    • Flexible reallocation<br>
+                    • Familiar prepaid model<br>
+                    • No monthly tier resets<br><br>
+                    <strong>Cons:</strong><br>
+                    • Low predictability for cost estimates<br>
+                    • Requires budget allocation UI<br>
+                    • More complex customer mental model<br>
+                    • Cannot show accurate "cost per agent"<br>
+                    • Use-it-or-lose-it may frustrate<br><br>
+                    <strong>Best For:</strong> Enterprise customers with diverse usage patterns, multiple Dialpad services, prepaid model preference
+                  </td>
+                  <td>
+                    <strong>Pros:</strong><br>
+                    • High predictability for cost estimates<br>
+                    • Simpler customer mental model<br>
+                    • Automatic volume discounts<br>
+                    • No upfront capital required<br>
+                    • Accurate costs in Agent Builder<br><br>
+                    <strong>Cons:</strong><br>
+                    • Less flexible - no credit reallocation<br>
+                    • Dual pricing models in one surface<br>
+                    • Monthly tier resets<br>
+                    • Two billing systems to explain<br><br>
+                    <strong>Best For:</strong> Cost predictability priority, new to Dialpad ecosystem, pay-as-you-go preference
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Decision Criteria</h3>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Question</th>
+                  <th>Scenario A</th>
+                  <th>Scenario B</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Which is easier to understand?</strong></td>
+                  <td>"I have 7,234 credits left"</td>
+                  <td>"I'm at Tier 2, 267 to Tier 3"</td>
+                </tr>
+                <tr>
+                  <td><strong>Which encourages desired behavior?</strong></td>
+                  <td>May discourage usage (pool running out)</td>
+                  <td>Encourages usage (unlock savings)</td>
+                </tr>
+                <tr>
+                  <td><strong>Which is easier to sell/quote?</strong></td>
+                  <td>"$8K/month, locked rates"</td>
+                  <td>"Rates range from X to Y based on volume"</td>
+                </tr>
+                <tr>
+                  <td><strong>Which requires less product complexity?</strong></td>
+                  <td>Budget allocation UI required</td>
+                  <td>Tier tracking required</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Recommendation Framework</h3>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 50%">Choose Scenario A if:</th>
+                  <th style="width: 50%">Choose Scenario B if:</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    • Multi-product alignment is critical<br>
+                    • Customer wants maximum flexibility<br>
+                    • Prepaid model preferred<br>
+                    • Cross-service credit sharing is valuable
+                  </td>
+                  <td>
+                    • Cost predictability is paramount<br>
+                    • Simpler mental model is desired<br>
+                    • Progressive discounts motivate usage<br>
+                    • Accurate Agent Builder estimates are critical
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="page-section">
           <h2>Long-Term Vision (Future Scenarios)</h2>
 
           <p>Document explores two approaches:</p>
@@ -284,6 +514,99 @@
             <li><strong>Video game arcade with tier cards:</strong> First 100 games cost $1 each. Next 500 games cost $0.80 each. After 1000 games, pay only $0.60 each. Rates adjust automatically as you play more.</li>
             <li><strong>Post-paid phone plan:</strong> Pay at month-end based on actual usage. The more you use, the cheaper each minute becomes. 0-100 mins = $0.10/min, 100-500 mins = $0.08/min, 500+ mins = $0.05/min.</li>
           </ul>
+        </div>
+
+        <div class="page-section">
+          <h2>Summary of Changes Requested by Josh on Dec 4th 2025</h2>
+
+          <ol>
+            <li>
+              <strong>Reduce visual noise</strong>
+              <ul>
+                <li>Remove large bars, rings, and decorative graphics.</li>
+                <li>Prioritize numbers over visuals.</li>
+                <li>Avoid repeating the same status signal multiple times (e.g., "Trending high").</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Improve clarity of remaining vs used</strong>
+              <ul>
+                <li>Emphasize remaining credits or remaining spend more strongly than used amounts.</li>
+                <li>Make the "remaining" value the dominant number for quick scanning.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Simplify layout and information density</strong>
+              <ul>
+                <li>Reduce text per row and avoid paragraphs.</li>
+                <li>Collapse alloc/used/remaining into tighter formats.</li>
+                <li>Make the interface feel like a control panel, not a report.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Replace verbose labels with simple indicators</strong>
+              <ul>
+                <li>Use minimal status markers (dot + text) instead of pills or tags.</li>
+                <li>Shorten interpretation lines to mechanical phrases.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Add predictive signals</strong>
+              <ul>
+                <li>Show simple pacing indicators (on track, projected over).</li>
+                <li>Add micro-visuals (tiny sparkline or meter) to convey trend direction.</li>
+                <li>Provide a single trend summary rather than repeating it across sections.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Strengthen budgeting and controls</strong>
+              <ul>
+                <li>Add ability to allocate budgets per category.</li>
+                <li>Include hard and soft caps.</li>
+                <li>Provide clear alerts (thresholds, forecast depletion).</li>
+                <li>Make rollover management clear for one-time credits.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Consistent treatment across A and B</strong>
+              <ul>
+                <li>Scenario B should follow the same structural principles as Scenario A.</li>
+                <li>Use the same hero-card pattern, trend banner, and ledger-style table.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Reorganize the hierarchy</strong>
+              <ul>
+                <li>Trend banner at the top with a single interpretation line.</li>
+                <li>Hero cards present the most important metrics.</li>
+                <li>Budget snapshot or tier progress follows as a compact ledger.</li>
+                <li>Purchasing actions (Add Credits) belong in credit-based sections only, not in budget tables.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Clarify credit pool behavior</strong>
+              <ul>
+                <li>Explain sequencing between renewing and one-time credits.</li>
+                <li>Allow configuration of rollover, auto-top-up, and fallback rules.</li>
+              </ul>
+            </li>
+
+            <li>
+              <strong>Avoid documentation-like content</strong>
+              <ul>
+                <li>Replace explanatory blocks with short, self-evident UI patterns.</li>
+                <li>Provide optional inline expansions only when needed.</li>
+              </ul>
+            </li>
+          </ol>
         </div>
       </div>
     </div>

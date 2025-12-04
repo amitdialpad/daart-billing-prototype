@@ -6,105 +6,107 @@
         <p class="subtitle">Scenario B: Dynamic Tiered Rates</p>
       </div>
 
-      <!-- Tier Status & Monthly Spend -->
+      <!-- Trend Card (1-line banner) -->
+      <div class="trend-card">
+        <span class="status-dot status-warning">●</span> Trending high · Used <strong>${{ data.currentSpend.toLocaleString() }}</strong> by day 10 (expected <strong>~$1,000</strong>) · Forecast: <strong>${{ data.forecast.projectedSpendByMonthEnd.toLocaleString() }}</strong> by {{ data.forecast.projectedDate }}
+      </div>
+
+      <!-- Hero Cards Grid (3 cards) -->
       <div class="card">
-        <!-- Hero: Spend -->
-        <div class="hero-section">
-          <div class="hero-label">This Month's Spending</div>
-          <div class="hero-header">
-            <div class="hero-value">${{ data.currentSpend.toLocaleString() }} / ${{ data.monthlySpendLimit.toLocaleString() }}</div>
-            <div class="hero-percentage">{{ data.spendPercentage }}% spent • ${{ data.currentSavings }} saved</div>
+        <div class="hero-cards-grid">
+          <!-- Card 1: Current Spend -->
+          <div class="hero-card hero-card-primary">
+            <div class="hero-header">
+              <span class="hero-label">CURRENT SPEND</span>
+            </div>
+            <div class="hero-number">${{ data.currentSpend.toLocaleString() }}</div>
+            <div class="hero-interpretation">{{ data.spendPercentage }}% of limit · ${{ data.currentSavings }} saved</div>
+            <div class="hero-commit"><span class="status-dot status-warning">●</span> High usage trend</div>
           </div>
-          <div class="progress-bar-hero">
-            <div class="progress-fill" :style="{ width: `${data.spendPercentage}%` }"></div>
+
+          <!-- Card 2: Current Tier -->
+          <div class="hero-card hero-card-primary">
+            <div class="hero-header">
+              <span class="hero-label">CURRENT TIER</span>
+            </div>
+            <div class="hero-tier-name">Tier {{ data.currentTier }} - {{ getCurrentTier().label }}</div>
+            <div class="hero-interpretation">Digital: ${{ getCurrentTier().digital }} · Voice: ${{ getCurrentTier().voice }}</div>
+            <div class="hero-commit">{{ data.conversationsThisMonth }} conversations this period</div>
+          </div>
+
+          <!-- Card 3: Next Tier Progress -->
+          <div class="hero-card">
+            <div class="hero-header">
+              <span class="hero-label">NEXT TIER PROGRESS</span>
+            </div>
+            <div class="hero-number">{{ data.conversationsToNextTier }}</div>
+            <div class="hero-interpretation">conversations to next tier</div>
+            <div class="hero-tier-meter">▂▄███●</div>
+            <div class="hero-commit">Next rates: Digital ${{ getNextTier().digital }} · Voice ${{ getNextTier().voice }}</div>
           </div>
         </div>
 
-        <div class="section-divider"></div>
-
-        <!-- Context: Current Tier -->
-        <div class="context-section">
-          <div class="hero-label">Your current plan</div>
-          <div class="context-line">
-            <strong>Tier {{ data.currentTier }}: {{ getCurrentTier().label }}</strong>
-            <span class="context-separator">•</span>
-            Digital ${{ getCurrentTier().digital }}
-            <span class="context-separator">•</span>
-            Voice ${{ getCurrentTier().voice }}
-            <span class="context-separator">•</span>
-            {{ data.conversationsThisMonth }} conversations ({{ data.conversationsDigital }} digital, {{ data.conversationsVoice }} voice)
+        <!-- Forecast Block (Mechanical) -->
+        <div class="forecast-block">
+          <div class="forecast-line-compact">
+            Forecast ({{ data.forecast.projectedDate }}): ${{ data.forecast.projectedSpendByMonthEnd.toLocaleString() }} · Tier {{ data.forecast.projectedTier }} · ${{ (data.currentSavings + data.forecast.estimatedSavings).toLocaleString() }} savings
           </div>
-        </div>
-
-        <!-- Progress: To Next Tier -->
-        <div class="tier-progress-section">
-          <div class="tier-progress-header">
-            <span>Progress to Tier {{ data.currentTier + 1 }}: {{ getNextTier().label }}</span>
-            <span>{{ data.conversationsToNextTier }} conversations away</span>
+          <div class="guardrails-compact">
+            Guardrail: >120% triggers discussion
           </div>
-          <div class="progress-bar-tier">
-            <div class="progress-fill" :style="{ width: `${data.progressPercent}%` }"></div>
-          </div>
-          <div class="next-tier-rates">
-            Next tier rates: Digital ${{ getNextTier().digital }} • Voice ${{ getNextTier().voice }}
-          </div>
-        </div>
-
-        <div class="section-divider"></div>
-
-        <!-- Forecast: Consolidated -->
-        <div class="forecast-line">
-          <div class="forecast-label">Forecast by {{ data.forecast.projectedDate }}</div>
-          <div class="forecast-data">
-            ${{ data.forecast.projectedSpendByMonthEnd.toLocaleString() }} spend
-            <span class="context-separator">•</span>
-            Tier {{ data.forecast.projectedTier }}
-            <span class="context-separator">•</span>
-            Est. ${{ (data.currentSavings + data.forecast.estimatedSavings).toLocaleString() }} total savings
-          </div>
-        </div>
-
-        <!-- Guardrails -->
-        <div class="guardrails-note">
-          Guardrails: 120% triggers true-up discussion • 200% requires AM meeting
         </div>
       </div>
 
       <!-- Other Services (Credit-Based Billing) -->
-      <div class="card">
-        <div class="card-header-with-actions">
-          <h2>Other Services (Credit-Based Billing)</h2>
+      <div v-if="!isEditingOtherServices" class="budget-snapshot-full">
+        <div class="budget-snapshot-header">
+          <div class="budget-header-left">
+            <h3>Other Services (Credit-Based Billing)</h3>
+            <span class="overall-trend">Overall pace: ● High usage trend</span>
+          </div>
           <div class="header-actions">
-            <template v-if="isEditingOtherServices">
-              <button class="btn-secondary" @click="cancelOtherServicesEdit">Cancel</button>
-              <button class="btn-primary" @click="saveOtherServicesChanges" :disabled="hasOtherServicesError">Save Changes</button>
-            </template>
-            <template v-else>
-              <button class="btn-secondary" @click="openOtherServicesSettings">Settings</button>
-            </template>
+            <button class="btn-export" @click="handleAddCredits">Add credits</button>
+            <button class="btn-export" @click="openOtherServicesSettings">Settings</button>
           </div>
         </div>
 
-        <div v-if="!isEditingOtherServices" class="card-row">
-          <div class="credits-status">
-            <div class="value-large">{{ data.otherServicesCredits.available.toLocaleString() }}</div>
-            <div class="label">Available Credits <span class="info-small">of {{ data.otherServicesCredits.totalCredits.toLocaleString() }} total</span></div>
+        <table class="budget-table-ledger">
+          <thead>
+            <tr>
+              <th class="th-category">Category</th>
+              <th class="th-alloc-used">Alloc/Used</th>
+              <th class="th-remaining">Remaining credits</th>
+              <th class="th-trend">Trend</th>
+              <th class="th-status">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(service, key) in data.otherServicesCredits.allocation" :key="key" class="budget-row">
+              <td class="td-category">{{ getServiceLabel(key) }}</td>
+              <td class="td-alloc-used">{{ service.allocated.toLocaleString() }} · {{ service.used.toLocaleString() }} used</td>
+              <td class="td-remaining">{{ (service.allocated - service.used).toLocaleString() }}</td>
+              <td class="td-trend">
+                <span class="sparkline">▂▃▅▇</span> {{ getOtherServicesTrend(service) }}
+              </td>
+              <td class="td-status">
+                <span class="status-dot" :class="getOtherServicesStatusClass(service)">●</span> {{ getOtherServicesStatusText(service) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Other Services Editing Mode -->
+      <div v-else class="card">
+        <div class="card-header-with-actions">
+          <h2>Other Services Settings</h2>
+          <div class="header-actions">
+            <button class="btn-secondary" @click="cancelOtherServicesEdit">Cancel</button>
+            <button class="btn-primary" @click="saveOtherServicesChanges" :disabled="hasOtherServicesError">Save Changes</button>
           </div>
         </div>
 
-        <div v-if="!isEditingOtherServices" class="usage-list-simple">
-          <div v-for="(service, key) in data.otherServicesCredits.allocation" :key="key" class="usage-item-simple">
-            <div class="usage-header-simple">
-              <span class="usage-label">{{ getServiceLabel(key) }}</span>
-              <span class="usage-amount">{{ service.used.toLocaleString() }} / {{ service.allocated.toLocaleString() }} credits</span>
-            </div>
-            <div class="progress-bar-small">
-              <div class="progress-fill" :style="{ width: `${(service.used / service.allocated) * 100}%` }"></div>
-            </div>
-          </div>
-        </div>
-
-        <div v-else class="allocation-grid">
+        <div class="allocation-grid">
           <div v-for="(service, key) in editableOtherServices" :key="key" class="allocation-row">
             <div class="allocation-service">{{ getServiceLabel(key) }}</div>
             <div class="allocation-input-cell">
@@ -126,7 +128,7 @@
           </div>
         </div>
 
-        <div v-if="isEditingOtherServices" class="edit-summary">
+        <div class="edit-summary">
           <div class="summary-line">
             <span class="summary-label">Total Allocated:</span>
             <span class="summary-value">{{ totalOtherServicesAllocated.toLocaleString() }} credits</span>
@@ -395,6 +397,12 @@ const openOtherServicesSettings = () => {
   isEditingOtherServices.value = true
 }
 
+const handleAddCredits = () => {
+  // Placeholder for Add Credits functionality
+  console.log('Add credits clicked')
+  // TODO: Implement add credits flow
+}
+
 const cancelOtherServicesEdit = () => {
   isEditingOtherServices.value = false
   editableOtherServices.value = {}
@@ -538,6 +546,51 @@ const getServiceLabel = (key) => {
     'domestic': 'Domestic Unlimited Calling'
   }
   return labels[key] || key
+}
+
+// Other Services Status & Trend Functions
+const getOtherServicesTrend = (service) => {
+  // Calculate expected vs actual burn rate
+  const dayOfMonth = 10 // Simulated day 10
+  const expectedDaily = service.allocated / 30
+  const actualDaily = service.used / dayOfMonth
+  const variance = actualDaily - expectedDaily
+
+  if (Math.abs(variance) < expectedDaily * 0.1) {
+    return 'On track'
+  } else if (variance > 0) {
+    return `↑${Math.round(Math.abs(variance))}`
+  } else {
+    return `↓${Math.round(Math.abs(variance))}`
+  }
+}
+
+const getOtherServicesStatusClass = (service) => {
+  const usagePercent = (service.used / service.allocated) * 100
+  const dayOfMonth = 10
+  const expectedPercent = (dayOfMonth / 30) * 100
+
+  if (usagePercent > expectedPercent * 1.2) {
+    return 'status-over'
+  } else if (usagePercent > expectedPercent * 1.1) {
+    return 'status-warning'
+  } else {
+    return 'status-on-track'
+  }
+}
+
+const getOtherServicesStatusText = (service) => {
+  const usagePercent = (service.used / service.allocated) * 100
+  const dayOfMonth = 10
+  const expectedPercent = (dayOfMonth / 30) * 100
+
+  if (usagePercent > expectedPercent * 1.2) {
+    return 'Over pace'
+  } else if (usagePercent > expectedPercent * 1.1) {
+    return 'Trending high'
+  } else {
+    return 'On track'
+  }
 }
 </script>
 
@@ -1753,5 +1806,292 @@ h2 {
 
 .trend-value.flat {
   color: #666666;
+}
+
+/* ===== SCENARIO B SPECIFIC STYLES ===== */
+
+/* Trend Card (1-line banner) */
+.trend-card {
+  background-color: #FFFBF0;
+  border: 1px solid #FFE0B2;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #1C1C1C;
+  line-height: 1.4;
+}
+
+.trend-card strong {
+  font-weight: 700;
+  color: #1C1C1C;
+}
+
+/* Status Dots */
+.status-dot {
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.status-dot.status-on-track {
+  color: #10B981;
+}
+
+.status-dot.status-warning {
+  color: #F59E0B;
+}
+
+.status-dot.status-over {
+  color: #EF4444;
+}
+
+/* Hero Cards Grid - 3 columns for Scenario B */
+.hero-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Hero Card Base */
+.hero-card {
+  background-color: #FAFAFA;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-card-primary {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Hero Card Elements */
+.hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.hero-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hero-number {
+  font-size: 36px;
+  font-weight: 600;
+  color: #1C1C1C;
+  line-height: 1.2;
+}
+
+.hero-interpretation {
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.4;
+}
+
+.hero-commit {
+  font-size: 13px;
+  color: #888888;
+  margin-top: 4px;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-badge.status-on-track {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.status-badge.status-warning {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.status-badge.status-over {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+/* Tier Name - Prominent Display */
+.hero-tier-name {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1C1C1C;
+  line-height: 1.2;
+}
+
+/* Tier Meter - Unicode Progress Bar */
+.hero-tier-meter {
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: #1C1C1C;
+  margin: 8px 0;
+  font-family: monospace;
+}
+
+/* Forecast Block */
+.forecast-block {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #FAFAFA;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;
+}
+
+.forecast-line-compact {
+  font-size: 14px;
+  color: #1C1C1C;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.forecast-line-compact strong {
+  font-weight: 600;
+}
+
+.guardrails-compact {
+  font-size: 11px;
+  color: #999999;
+  font-weight: 400;
+  padding-top: 8px;
+  border-top: 1px solid #E5E5E5;
+}
+
+/* ===== BUDGET TABLE LEDGER STYLES (Scenario A Style) ===== */
+
+/* Budget Snapshot Full Width */
+.budget-snapshot-full {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 8px;
+  padding: 24px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.budget-snapshot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.budget-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.budget-snapshot-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin: 0;
+}
+
+.overall-trend {
+  font-size: 12px;
+  color: #666666;
+  font-weight: 400;
+}
+
+.btn-export {
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-export:hover {
+  background-color: #F9F9F9;
+  border-color: #999999;
+}
+
+/* Budget Table Ledger */
+.budget-table-ledger {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.budget-table-ledger thead {
+  border-bottom: 1px solid #eee;
+}
+
+.budget-table-ledger th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 12px;
+}
+
+.budget-table-ledger tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+.budget-table-ledger td {
+  padding: 12px;
+  font-size: 14px;
+  color: #1C1C1C;
+  vertical-align: middle;
+}
+
+/* Category column */
+.td-category {
+  font-weight: 600;
+}
+
+/* Alloc/Used column */
+.td-alloc-used {
+  color: #666666;
+}
+
+/* Remaining column - HERO NUMBER */
+.td-remaining {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Trend column */
+.td-trend {
+  color: #666666;
+}
+
+.sparkline {
+  font-size: 12px;
+  margin-right: 4px;
+  color: #888888;
+}
+
+/* Status column */
+.td-status {
+  white-space: nowrap;
 }
 </style>

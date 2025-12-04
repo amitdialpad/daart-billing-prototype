@@ -377,5 +377,92 @@ Both scenarios tested at: `http://localhost:3000/daart-billing-prototype/`
 
 ---
 
-**Last Updated**: December 3, 2025, 4:30 AM
-**Status**: Simplification complete, ready for review
+## Phase 5: Post-Deployment Refinements
+
+### Issue 8: Scenario B Tier Progress Clarity
+**Problem**: Users reaching next tier didn't see what benefits they'd get (new rates)
+
+**User Feedback**: "We dont tell the user what will the rates be once they hit tier 3, why?"
+
+**Changes Made**:
+- **File**: `/src/pages/ScenarioB.vue`
+- Added next tier rates display below progress bar:
+  ```vue
+  <div class="next-tier-rates">
+    Next tier rates: Digital ${{ getNextTier().digital }} • Voice ${{ getNextTier().voice }}
+  </div>
+  ```
+- Implemented `getNextTier()` function to calculate upcoming tier rates
+
+### Issue 9: Conversation Breakdown Context
+**Problem**: Breakdown "450 digital, 284 voice" appeared disconnected from total count
+
+**User Feedback**: Noted the breakdown was "out of place"
+
+**Changes Made**:
+- **File**: `/src/pages/ScenarioB.vue`
+- Moved breakdown inline with total: "734 conversations (450 digital, 284 voice)"
+- Improved readability and relationship between total and breakdown
+
+### Issue 10: Service Naming Inconsistencies
+**Problem**: Service names in Scenario B didn't match Scenario A
+- "DOMENSTIC" (typo)
+- All caps names ("SMS", "INTERNATIONAL")
+
+**User Feedback**: "I saw some inconsistency & typo in scenario B... should not be all caps & use those full names as we have in Scenario A"
+
+**Changes Made**:
+- **File**: `/src/pages/ScenarioB.vue`
+- Created `getServiceLabel()` function to standardize naming:
+  ```javascript
+  const getServiceLabel = (key) => {
+    const labels = {
+      'sms': 'SMS/MMS',
+      'international': 'International Calling',
+      'fax': 'Fax',
+      'domestic': 'Domestic Unlimited Calling'
+    }
+    return labels[key] || key
+  }
+  ```
+- Applied to both display and editing views
+
+### Issue 11: Notes Page Creation
+**Problem**: Needed centralized place for PRD requirements and scenario comparison
+
+**Changes Made**:
+- **File**: `/src/pages/Notes.vue` (new file)
+- Added PRD requirements for 5 impacted pages:
+  1. Launchpad - Aggregated usage cost overview
+  2. Agent Builder - ROI calculator, unified builder
+  3. Conversation History - Billable filtering
+  4. Credit Analytics - Real-time burn rate, forecasting
+  5. RBAC Permissions - Two roles (Designer, Billing Admin)
+- Added comprehensive comparison framework with 4 tables:
+  1. Detailed Comparison (7 dimensions)
+  2. Pros & Cons Summary
+  3. Decision Criteria
+  4. Recommendation Framework
+- **File**: `/src/components/layout/LeftSidebar.vue`
+- Added Notes link in sidebar footer
+
+### Issue 12: GitHub Pages Deployment
+**Problem**: Changes not appearing on production URL
+
+**Root Cause**: GitHub Pages serves from `/docs` folder, not `/dist`
+
+**Solution**:
+```bash
+npm run build
+cp -r dist/* docs/
+git add docs/
+git commit -m "Deploy updates"
+git push origin master
+```
+
+**Production URL**: https://amitdialpad.github.io/daart-billing-prototype/
+
+---
+
+**Last Updated**: December 3, 2025, 11:00 AM
+**Status**: Deployed to production, all refinements complete
