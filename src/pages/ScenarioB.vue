@@ -7,12 +7,12 @@
       </div>
 
       <!-- Trend Card (1-line banner) -->
-      <div class="trend-card">
+      <div v-if="!isEditingSpendLimit && !isEditingOtherServices" class="trend-card">
         <span class="status-dot status-warning">●</span> Trending high · Used <strong>${{ data.currentSpend.toLocaleString() }}</strong> by day 10 (expected <strong>~$1,000</strong>) · Forecast: <strong>${{ data.forecast.projectedSpendByMonthEnd.toLocaleString() }}</strong> by {{ data.forecast.projectedDate }}
       </div>
 
       <!-- Hero Cards Grid (3 cards) -->
-      <div class="card">
+      <div v-if="!isEditingSpendLimit && !isEditingOtherServices" class="card">
         <div class="hero-cards-grid">
           <!-- Card 1: Current Spend -->
           <div class="hero-card hero-card-primary">
@@ -20,8 +20,16 @@
               <span class="hero-label">CURRENT SPEND</span>
             </div>
             <div class="hero-number">${{ data.currentSpend.toLocaleString() }}</div>
-            <div class="hero-interpretation">{{ data.spendPercentage }}% of limit · ${{ data.currentSavings }} saved</div>
-            <div class="hero-commit"><span class="status-dot status-warning">●</span> High usage trend</div>
+            <div class="hero-interpretation" v-if="data.monthlySpendLimit">
+              {{ data.spendPercentage }}% of ${{ data.monthlySpendLimit.toLocaleString() }} limit · ${{ data.currentSavings }} saved
+            </div>
+            <div class="hero-interpretation" v-else>
+              Spend to date · ${{ data.currentSavings }} saved
+            </div>
+            <div class="hero-commit">↑ Faster than expected</div>
+            <button class="manage-limit-link" @click="openSpendLimitSettings">
+              Manage spend limit
+            </button>
           </div>
 
           <!-- Card 2: Current Tier -->
@@ -41,7 +49,6 @@
             </div>
             <div class="hero-number">{{ data.conversationsToNextTier }}</div>
             <div class="hero-interpretation">conversations to next tier</div>
-            <div class="hero-tier-meter">▂▄███●</div>
             <div class="hero-commit">Next rates: Digital ${{ getNextTier().digital }} · Voice ${{ getNextTier().voice }}</div>
           </div>
         </div>
@@ -57,8 +64,62 @@
         </div>
       </div>
 
+      <!-- Spend Limit Editing Mode -->
+      <div v-if="isEditingSpendLimit && !isEditingOtherServices" class="card">
+        <div class="card-header-with-actions">
+          <h2>Spend limit</h2>
+          <div class="header-actions-grouped">
+            <button class="btn-secondary" @click="cancelSpendLimitEdit">Cancel</button>
+            <button class="btn-primary" @click="saveSpendLimitChanges">Save changes</button>
+          </div>
+        </div>
+
+        <div class="spend-limit-form">
+          <div class="form-group">
+            <label class="form-label">Monthly spend limit</label>
+            <p class="form-helper">Soft limits trigger alerts; hard limits stop usage.</p>
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <input
+                type="number"
+                v-model.number="editableSpendLimit.amount"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group" v-if="editableSpendLimit.enabled">
+            <label class="form-label">Limit behavior</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  v-model="editableSpendLimit.type"
+                  value="soft"
+                />
+                <span>Soft limit – alert only</span>
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  v-model="editableSpendLimit.type"
+                  value="hard"
+                />
+                <span>Hard limit – stop at limit</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group-remove" v-if="editableSpendLimit.enabled">
+            <button class="link-remove-limit" @click="removeSpendLimit">
+              Remove limit (switch to unlimited pay-as-you-go)
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Other Services (Credit-Based Billing) -->
-      <div v-if="!isEditingOtherServices" class="budget-snapshot-full">
+      <div v-if="!isEditingOtherServices && !isEditingSpendLimit" class="budget-snapshot-full">
         <div class="budget-snapshot-header">
           <div class="budget-header-left">
             <h3>Other Services (Credit-Based Billing)</h3>
@@ -97,7 +158,7 @@
       </div>
 
       <!-- Other Services Editing Mode -->
-      <div v-else class="card">
+      <div v-if="isEditingOtherServices && !isEditingSpendLimit" class="card">
         <div class="card-header-with-actions">
           <h2>Other Services Settings</h2>
           <div class="header-actions">
@@ -128,6 +189,29 @@
           </div>
         </div>
 
+        <!-- Usage Alerts Section -->
+        <div class="alerts-section">
+          <h3 class="alerts-header">Usage Alerts</h3>
+          <p class="alerts-subtitle">Email alerts at first threshold • Services stop at second threshold</p>
+
+          <div class="alerts-list-single-column">
+            <div v-for="(limit, key) in data.otherServicesLimits" :key="key" class="alert-item">
+              <div class="alert-checkbox" :class="{ 'checked': limit.enabled }">
+                <svg v-if="limit.enabled" width="16" height="16" viewBox="0 0 16 16" fill="white">
+                  <path d="M13.5 4L6 11.5L2.5 8" stroke="white" stroke-width="2" fill="none"/>
+                </svg>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">
+                  {{ limit.label }}: {{ limit.softAlertPercent }}% /
+                  <span v-if="limit.hardStopPercent">{{ limit.hardStopPercent }}%</span>
+                  <span v-else class="no-limit">No limit</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="edit-summary">
           <div class="summary-line">
             <span class="summary-label">Total Allocated:</span>
@@ -137,18 +221,27 @@
       </div>
 
       <!-- Usage History -->
-      <div v-if="!isEditingOtherServices" class="card">
+      <div v-if="!isEditingOtherServices && !isEditingSpendLimit" class="card">
         <h2>Usage History (All Services)</h2>
         <p class="info">Shows both tiered rates (Agentic AI) and credit-based charges (SMS, International, Fax, Domestic)</p>
 
         <div class="history-controls">
           <div class="history-filters">
             <select v-model="selectedType" class="filter-select">
-              <option value="all">All Types</option>
+              <option value="all">All Channels</option>
               <option value="digital">AI Agent Digital</option>
               <option value="voice">AI Agent Voice</option>
               <option value="sms">SMS/MMS</option>
               <option value="international">International</option>
+            </select>
+            <select v-model="selectedAgent" class="filter-select">
+              <option value="all">All Agents</option>
+              <option value="Support Bot Alpha">Support Bot Alpha</option>
+              <option value="Support Bot Beta">Support Bot Beta</option>
+              <option value="Support Bot Gamma">Support Bot Gamma</option>
+              <option value="Sales Bot A">Sales Bot A</option>
+              <option value="Sales Bot B">Sales Bot B</option>
+              <option value="Routing Bot">Routing Bot</option>
             </select>
             <select v-model="selectedUserGroup" class="filter-select">
               <option value="all">All Users/Groups</option>
@@ -193,9 +286,12 @@
                 {{ entry.date }}<br>
                 <span class="small-text">{{ entry.time }}</span>
               </td>
-              <td class="text-secondary">
+              <td class="text-secondary" style="white-space: nowrap;">
                 {{ entry.duration }}
-                <span v-if="entry.rechargeApplied" class="recharge-badge" :title="entry.rechargeReason">2×</span>
+                <span v-if="entry.rechargeApplied" class="recharge-badge-wrapper">
+                  <span class="recharge-badge">2×</span>
+                  <span class="recharge-tooltip">{{ entry.rechargeReason }}</span>
+                </span>
               </td>
               <td class="text-center">
                 <span v-if="entry.billingModel === 'tiered'" class="billing-model-badge tiered-badge">
@@ -224,7 +320,7 @@
       </div>
 
       <!-- Team Consumption Summary -->
-      <div v-if="!isEditingOtherServices" class="card">
+      <div v-if="!isEditingOtherServices && !isEditingSpendLimit" class="card">
         <div class="summary-header-row">
           <div>
             <h2>Agent Consumption</h2>
@@ -274,7 +370,7 @@
       </div>
 
       <!-- FAQ -->
-      <div v-if="!isEditingOtherServices" class="card">
+      <div v-if="!isEditingOtherServices && !isEditingSpendLimit" class="card">
         <h2>Frequently Asked Questions</h2>
 
         <div class="faq-list">
@@ -388,13 +484,44 @@ import { mockData } from '../data/mockData'
 
 const data = ref(mockData.scenarioB)
 
+// Load saved spend limit from localStorage if it exists
+const savedSpendLimit = localStorage.getItem('scenarioB_spendLimit')
+if (savedSpendLimit) {
+  const saved = JSON.parse(savedSpendLimit)
+  // Merge with defaults to ensure all fields exist
+  data.value.spendLimitConfig = {
+    enabled: saved.enabled !== undefined ? saved.enabled : true,
+    amount: saved.amount !== undefined ? saved.amount : 5000,
+    type: saved.type || 'soft'
+  }
+  data.value.monthlySpendLimit = data.value.spendLimitConfig.enabled
+    ? data.value.spendLimitConfig.amount
+    : null
+  if (data.value.monthlySpendLimit) {
+    data.value.spendPercentage = Math.round(
+      (data.value.currentSpend / data.value.monthlySpendLimit) * 100
+    )
+  }
+}
+
 // Other services credit allocation editing
 const isEditingOtherServices = ref(false)
 const editableOtherServices = ref({})
 
+// Spend limit editing
+const isEditingSpendLimit = ref(false)
+const editableSpendLimit = ref({
+  enabled: data.value.spendLimitConfig?.enabled !== undefined ? data.value.spendLimitConfig.enabled : true,
+  amount: data.value.spendLimitConfig?.amount !== undefined ? data.value.spendLimitConfig.amount : data.value.monthlySpendLimit || 5000,
+  type: data.value.spendLimitConfig?.type || 'soft'
+})
+
 const openOtherServicesSettings = () => {
+  console.log('Opening other services settings, current allocation:', data.value.otherServicesCredits.allocation)
   editableOtherServices.value = JSON.parse(JSON.stringify(data.value.otherServicesCredits.allocation))
+  console.log('isEditingOtherServices set to:', true)
   isEditingOtherServices.value = true
+  console.log('isEditingOtherServices.value now:', isEditingOtherServices.value)
 }
 
 const handleAddCredits = () => {
@@ -409,6 +536,7 @@ const cancelOtherServicesEdit = () => {
 }
 
 const saveOtherServicesChanges = () => {
+  console.log('Saving other services, editable data:', editableOtherServices.value)
   data.value.otherServicesCredits.allocation = JSON.parse(JSON.stringify(editableOtherServices.value))
   // Recalculate totals
   const totalUsed = Object.values(editableOtherServices.value).reduce((sum, item) => sum + item.used, 0)
@@ -416,7 +544,55 @@ const saveOtherServicesChanges = () => {
   data.value.otherServicesCredits.used = totalUsed
   data.value.otherServicesCredits.available = totalAllocated - totalUsed
   data.value.otherServicesCredits.totalCredits = totalAllocated
+  console.log('After save, allocation:', data.value.otherServicesCredits.allocation)
   isEditingOtherServices.value = false
+}
+
+// Spend limit management
+const openSpendLimitSettings = () => {
+  editableSpendLimit.value = {
+    enabled: data.value.spendLimitConfig.enabled !== undefined ? data.value.spendLimitConfig.enabled : true,
+    amount: data.value.spendLimitConfig.amount !== undefined ? data.value.spendLimitConfig.amount : data.value.monthlySpendLimit || 5000,
+    type: data.value.spendLimitConfig.type || 'soft'
+  }
+  isEditingSpendLimit.value = true
+}
+
+const cancelSpendLimitEdit = () => {
+  isEditingSpendLimit.value = false
+}
+
+const removeSpendLimit = () => {
+  editableSpendLimit.value.enabled = false
+  editableSpendLimit.value.amount = null
+  saveSpendLimitChanges()
+}
+
+const saveSpendLimitChanges = () => {
+  data.value.spendLimitConfig = {
+    enabled: editableSpendLimit.value.enabled,
+    amount: editableSpendLimit.value.amount,
+    type: editableSpendLimit.value.type
+  }
+
+  // Update monthlySpendLimit based on enabled state
+  data.value.monthlySpendLimit = editableSpendLimit.value.enabled
+    ? editableSpendLimit.value.amount
+    : null
+
+  // Recalculate percentage if limit exists
+  if (data.value.monthlySpendLimit) {
+    data.value.spendPercentage = Math.round(
+      (data.value.currentSpend / data.value.monthlySpendLimit) * 100
+    )
+  } else {
+    data.value.spendPercentage = 0
+  }
+
+  // Save to localStorage for persistence
+  localStorage.setItem('scenarioB_spendLimit', JSON.stringify(data.value.spendLimitConfig))
+
+  isEditingSpendLimit.value = false
 }
 
 // Validation for other services
@@ -469,6 +645,7 @@ const biggestSpike = computed(() => {
 
 // Usage History filters
 const selectedType = ref('all')
+const selectedAgent = ref('all')
 const selectedUserGroup = ref('all')
 const selectedMonth = ref('Dec')
 
@@ -491,6 +668,13 @@ const filteredUsageHistory = computed(() => {
       const entryType = entry.type.toLowerCase()
       const filterType = selectedType.value.toLowerCase()
       if (!entryType.includes(filterType)) {
+        return false
+      }
+    }
+
+    // Filter by agent
+    if (selectedAgent.value !== 'all') {
+      if (entry.agentName !== selectedAgent.value) {
         return false
       }
     }
@@ -1002,6 +1186,12 @@ h2 {
   font-size: 11px;
 }
 
+.recharge-badge-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 4px;
+}
+
 .recharge-badge {
   display: inline-block;
   padding: 2px 4px;
@@ -1009,8 +1199,40 @@ h2 {
   color: #FFFFFF;
   border-radius: 3px;
   font-size: 10px;
-  margin-left: 4px;
   cursor: help;
+}
+
+.recharge-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+.recharge-badge-wrapper:hover .recharge-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.recharge-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #333;
 }
 
 .spend-row {
@@ -1378,6 +1600,73 @@ h2 {
 .summary-label {
   font-weight: 600;
   color: #666666;
+}
+
+/* Usage Alerts Section (inside Other Services Settings) */
+.alerts-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E5E5;
+}
+
+.alerts-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin: 0 0 4px 0;
+}
+
+.alerts-subtitle {
+  color: #666666;
+  font-size: 14px;
+  margin: 0 0 20px 0;
+}
+
+.alerts-list-single-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #FAFAFA;
+  border-radius: 4px;
+  border: 1px solid #E5E5E5;
+}
+
+.alert-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #CCCCCC;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: #FFFFFF;
+}
+
+.alert-checkbox.checked {
+  background-color: #1C1C1C;
+  border-color: #1C1C1C;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  font-size: 14px;
+  color: #1C1C1C;
+  font-weight: 500;
+}
+
+.no-limit {
+  color: #999999;
 }
 
 .summary-value {
@@ -1862,6 +2151,7 @@ h2 {
   padding: 20px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .hero-card-primary {
@@ -1937,15 +2227,6 @@ h2 {
   font-weight: 600;
   color: #1C1C1C;
   line-height: 1.2;
-}
-
-/* Tier Meter - Unicode Progress Bar */
-.hero-tier-meter {
-  font-size: 20px;
-  letter-spacing: 2px;
-  color: #1C1C1C;
-  margin: 8px 0;
-  font-family: monospace;
 }
 
 /* Forecast Block */
@@ -2093,5 +2374,165 @@ h2 {
 /* Status column */
 .td-status {
   white-space: nowrap;
+}
+
+/* ===== SPEND LIMIT MANAGEMENT ===== */
+
+/* Hero action button (matches Scenario A "Add credits" style) */
+.hero-action-btn {
+  margin-top: 12px;
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #1C1C1C;
+  transition: all 0.2s ease;
+}
+
+.hero-action-btn:hover {
+  background-color: #F9F9F9;
+  border-color: #999999;
+}
+
+/* Manage spend limit link - subtle text link */
+.manage-limit-link {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #666666;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+  font-weight: 400;
+  display: block;
+  text-align: left;
+}
+
+.manage-limit-link:hover {
+  color: #1C1C1C;
+}
+
+/* Spend limit form container */
+.spend-limit-form {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group-remove {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin-bottom: 8px;
+}
+
+.form-helper {
+  font-size: 12px;
+  color: #666666;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  border: 1px solid #CCCCCC;
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 300px;
+}
+
+.input-with-prefix:focus-within {
+  border-color: #0066FF;
+}
+
+.input-prefix {
+  padding: 0 12px;
+  background-color: #F5F5F5;
+  color: #666666;
+  font-size: 14px;
+  font-weight: 500;
+  border-right: 1px solid #CCCCCC;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.form-input {
+  flex: 1;
+  border: none;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1C1C1C;
+  outline: none;
+  font-family: inherit;
+}
+
+.form-input:disabled {
+  background-color: #F5F5F5;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #1C1C1C;
+  cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+  cursor: pointer;
+}
+
+.link-remove-limit {
+  font-size: 12px;
+  color: #6B7280;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.link-remove-limit:hover {
+  color: #1C1C1C;
+}
+
+/* Header actions grouped (for Cancel/Save button pair) */
+.header-actions-grouped {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 </style>

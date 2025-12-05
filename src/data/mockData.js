@@ -607,6 +607,13 @@ export const mockData = {
     minimumCommitment: 10000, // Enterprise-focused: 10K+ credits minimum at launch
     discountApplied: 'progressive', // Discount improves automatically with volume
 
+    // Spend Limit Configuration
+    spendLimitConfig: {
+      enabled: true,
+      amount: 5000,
+      type: 'soft' // 'soft' | 'hard'
+    },
+
     // Forecasted Usage (Agentic AI)
     forecast: {
       projectedSpendByMonthEnd: 4850,
@@ -676,6 +683,34 @@ export const mockData = {
       },
       renewalDate: 'Jan 1, 2026',
       note: 'SMS, International, and Fax services continue using credit-based billing. Domestic calling is billed separately as unlimited.'
+    },
+
+    // Usage Alerts for Other Services (SMS, International, Fax only)
+    otherServicesLimits: {
+      sms: {
+        softAlert: 2000,        // 80% of 2500
+        softAlertPercent: 80,
+        hardStop: 2500,         // 100%
+        hardStopPercent: 100,
+        enabled: true,
+        label: 'SMS/MMS'
+      },
+      international: {
+        softAlert: 1200,        // 80% of 1500
+        softAlertPercent: 80,
+        hardStop: 1500,         // 100%
+        hardStopPercent: 100,
+        enabled: true,
+        label: 'International'
+      },
+      fax: {
+        softAlert: 800,         // 80% of 1000
+        softAlertPercent: 80,
+        hardStop: 1000,         // 100%
+        hardStopPercent: 100,
+        enabled: true,
+        label: 'Fax'
+      }
     },
 
     // Rate Lock Policy
@@ -941,6 +976,7 @@ export const mockData = {
         billingModel: 'tiered',  // Tiered pricing
         channel: '#sales-queue',
         userGroup: 'Sales Team',
+        agentName: 'Sales Bot B',
         contact: 'lisa.wong@meridiantech.io',
         duration: '5m 10s',
         actions: 14,
@@ -962,6 +998,7 @@ export const mockData = {
         billingModel: 'tiered',  // Tiered pricing
         channel: '(415) 923-8467',
         userGroup: 'Support Team',
+        agentName: 'Support Bot Beta',
         contact: 'David Kim',
         duration: '4m 30s',
         actions: 8,
@@ -1014,6 +1051,7 @@ export const mockData = {
         billingModel: 'tiered',  // Tiered pricing
         channel: '#support-queue',
         userGroup: 'Support Team',
+        agentName: 'Support Bot Alpha',
         contact: 'carlos.rivera@nexusgroup.com',
         duration: '3m 00s',
         actions: 6,
@@ -1047,6 +1085,7 @@ export const mockData = {
         billingModel: 'tiered',  // Tiered pricing
         channel: 'help@stellarventures.com',
         userGroup: 'Support Team',
+        agentName: 'Support Bot Alpha',
         contact: 'sophia.anderson@financeplus.com',
         duration: '2m 45s',
         actions: 4,
@@ -1064,6 +1103,7 @@ export const mockData = {
         billingModel: 'tiered',  // Tiered pricing
         channel: '(212) 784-5293',
         userGroup: 'Support Team',
+        agentName: 'Sales Bot A',
         contact: 'Patricia Rodriguez',
         duration: '3m 45s',
         actions: 6,

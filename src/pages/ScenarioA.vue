@@ -2339,20 +2339,20 @@ h2 {
 }
 
 .alert-checkbox {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #CCCCCC;
   border-radius: 4px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white;
+  background-color: #FFFFFF;
 }
 
 .alert-checkbox.checked {
-  background-color: #6B46EE;
-  border-color: #6B46EE;
+  background-color: #1C1C1C;
+  border-color: #1C1C1C;
 }
 
 .alert-content {
