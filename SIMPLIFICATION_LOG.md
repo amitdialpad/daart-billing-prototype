@@ -613,12 +613,128 @@ git push origin master
 
 ---
 
+## Phase 7: Scenario B Enhancements - Spend Limit Management (December 5, 2025 - Afternoon/Evening)
+
+**Goal**: Add spend limit management functionality to Scenario B with inline editing pattern
+
+### Issue 22: Manage Spend Limit Functionality
+**Requirement**: Add "Manage spend limit" link to Current Spend card allowing admins to change spend limits
+
+**Implementation**:
+- **File**: `/src/pages/ScenarioB.vue` (lines 29-32, 67-119, 513-517, 2248-2357)
+- Added subtle underlined text link at bottom-right of Current Spend card
+- Implements inline replacement pattern (cards → panels)
+- localStorage persistence for spend limit configuration
+
+**Josh's 6 Refinements Applied**:
+1. Input shows current limit value (not placeholder)
+2. Reduced vertical spacing by 20-25% (24px → 18px)
+3. Short header: "Spend limit" (not "Spend Limit Settings")
+4. Grouped Cancel/Save buttons as right-aligned pair
+5. Remove limit as quiet grey text link (not button)
+6. Helper text: "Soft limits trigger alerts; hard limits stop usage."
+
+**Button Style Iteration**:
+- Started as button (matching "Add credits" style)
+- Josh feedback: "This button is too heavy"
+- Changed to subtle underlined text link (#666666 grey)
+
+**Defensive Defaults Added**:
+```javascript
+const editableSpendLimit = ref({
+  enabled: data.value.spendLimitConfig?.enabled !== undefined
+    ? data.value.spendLimitConfig.enabled
+    : true,
+  amount: data.value.spendLimitConfig?.amount !== undefined
+    ? data.value.spendLimitConfig.amount
+    : data.value.monthlySpendLimit || 5000,
+  type: data.value.spendLimitConfig?.type || 'soft'
+})
+```
+
+**Critical User Feedback**: "Ok dont break this again please" - Clear instruction to avoid modifying this code
+
+### Issue 23: Usage Alerts Integration
+**Requirement**: Add Usage Alerts section INSIDE Other Services Settings (not separate), showing only SMS, International, Fax
+
+**Implementation**:
+- **Files**: `/src/pages/ScenarioB.vue` (lines 192-213, 1605-1670), `/src/data/mockData.js` (lines 688-714)
+- Added `otherServicesLimits` data structure
+- Alert structure: 80% email alert / 100% hard stop
+- NO AI Agent alerts (uses tiered pricing/spend limits instead)
+
+**Design Decision**: Clear separation of concerns
+- Agentic AI: Uses spend limits (dynamic tiered rates)
+- Other Services: Use credit alerts (SMS, International, Fax)
+
+**Unified Styling**:
+- **File**: `/src/pages/ScenarioA.vue` (lines 2341-2356)
+- Changed Scenario A checkboxes from purple (#6B46EE) to black (#1C1C1C)
+- Ensures consistent design system across both scenarios
+
+### Issue 24: All Agents Filter Dropdown
+**Requirement**: Add "All Agents" dropdown to Usage History for filtering by specific agents
+
+**Implementation**:
+- **File**: `/src/pages/ScenarioB.vue` (lines 214-222, 620, 647-652)
+- Added dropdown between "All Channels" and "All Users/Groups"
+- Filter options: Support Bot Alpha/Beta/Gamma, Sales Bot A/B, Routing Bot
+- Implemented filtering logic in computed property
+
+**Capitalization Fix**: "All channels" → "All Channels"
+
+### Issue 25: 2× Tooltip Fix
+**Problem**: 2× badge showed cursor:help but no tooltip appeared
+
+**Root Cause**: Using simple title attribute instead of proper tooltip wrapper
+
+**Solution**:
+- **File**: `/src/pages/ScenarioB.vue` (lines 257-262, 1144-1191)
+- Implemented wrapper pattern (recharge-badge-wrapper, recharge-badge, recharge-tooltip)
+- CSS hover functionality with transitions
+- Arrow pointer using ::after pseudo-element
+
+**Wrapping Fix**: Added `white-space: nowrap` to prevent "5m 10s 2×" from wrapping
+
+### Issue 26: Visibility Condition Fixes
+**Problem**: Trend card and hero cards still visible when editing spend limit or other services
+
+**Root Cause**: v-else-if creating incorrect conditional chains
+
+**Solution**:
+- **File**: `/src/pages/ScenarioB.vue` (lines 10, 15, 68, 161)
+- Changed to explicit v-if conditions with both flags
+- Trend card: `v-if="!isEditingSpendLimit && !isEditingOtherServices"`
+- Hero cards: `v-if="!isEditingSpendLimit && !isEditingOtherServices"`
+- Spend limit editing: `v-if="isEditingSpendLimit && !isEditingOtherServices"`
+- Other services editing: `v-if="isEditingOtherServices && !isEditingSpendLimit"`
+
+**Result**: Clean separation - only one view shows at a time
+
+### Deployment
+**Process**:
+```bash
+npm run build
+rm -rf docs/* && cp -r dist/* docs/
+git add .
+git commit -m "Add Scenario B enhancements and fixes"
+git push origin master
+```
+
+**Commit**: `b875ad0`
+**Changes**: 13 files, 565 insertions(+), 84 deletions(-)
+**Deployment**: Successful to https://amitdialpad.github.io/daart-billing-prototype/
+**Changes Live**: December 5, 2025, 8:00 PM
+
+---
+
 ## Summary of All Changes
 
 ### Metrics:
 - **Phase 1-5** (Dec 2-3): 23 cards → 11 cards (52% reduction)
-- **Phase 6** (Dec 4-5): Visual refinements, no card count change
-- **Total improvements**: 67% fewer words, 45% less scrolling
+- **Phase 6** (Dec 4-5 Morning): Visual refinements, no card count change
+- **Phase 7** (Dec 5 Afternoon/Evening): Functional enhancements (spend limit, usage alerts, filters)
+- **Total improvements**: 67% fewer words, 45% less scrolling, enhanced functionality
 
 ### Design Principles Applied:
 ✅ One primary signal (no repetition)
@@ -628,17 +744,27 @@ git push origin master
 ✅ Opt into complexity (FAQs collapsed)
 ✅ Self-evident UI (no docs needed)
 
-### Files Modified (Phase 6):
+### Files Modified:
+**Phase 6** (Dec 4-5 Morning):
 1. `/src/pages/ScenarioA.vue` - Added sparklines, shadow
 2. `/src/pages/ScenarioB.vue` - 6 phases of refinements
 3. `/src/pages/Notes.vue` - Josh's principles documented
 4. `/src/data/mockData.js` - Fixed calculations
-5. `/Users/amitayre/daart-billing/CURRENT_STATE.md` - Updated status
-6. `/Users/amitayre/daart-billing/README.md` - Updated date
-7. `/Users/amitayre/daart-billing/SIMPLIFICATION_LOG.md` - This file
+5. `CURRENT_STATE.md` - Updated status
+6. `README.md` - Updated date
+7. `SIMPLIFICATION_LOG.md` - This file
+
+**Phase 7** (Dec 5 Afternoon/Evening):
+1. `/src/pages/ScenarioB.vue` - Spend limit, usage alerts, filters, visibility fixes, tooltip
+2. `/src/pages/ScenarioA.vue` - Unified checkbox styling (purple → black)
+3. `/src/data/mockData.js` - Added otherServicesLimits
+4. `SESSION_SUMMARY_DEC5_CONTINUED.md` - New session summary
+5. `CURRENT_STATE.md` - Updated with Phase 7 changes
+6. `README.md` - Updated date
+7. `SIMPLIFICATION_LOG.md` - This file
 
 ---
 
-**Last Updated**: December 5, 2025, 8:00 AM
-**Status**: Deployed to production, Josh's Dec 4th feedback fully implemented
-**Next**: Thursday leadership meeting presentation
+**Last Updated**: December 5, 2025, 8:00 PM
+**Status**: Deployed to production, Josh's feedback + Scenario B enhancements fully implemented
+**Latest Commit**: `b875ad0` - Scenario B enhancements (spend limit, usage alerts, filters)

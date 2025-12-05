@@ -300,11 +300,20 @@
         <div class="history-controls">
           <div class="history-filters">
             <select v-model="selectedType" class="filter-select">
-              <option value="all">All Types</option>
+              <option value="all">All Channels</option>
               <option value="digital">AI Agent Digital</option>
               <option value="voice">AI Agent Voice</option>
               <option value="sms">SMS/MMS</option>
               <option value="international">International</option>
+            </select>
+            <select v-model="selectedAgent" class="filter-select">
+              <option value="all">All Agents</option>
+              <option value="Support Bot Alpha">Support Bot Alpha</option>
+              <option value="Support Bot Beta">Support Bot Beta</option>
+              <option value="Support Bot Gamma">Support Bot Gamma</option>
+              <option value="Sales Bot A">Sales Bot A</option>
+              <option value="Sales Bot B">Sales Bot B</option>
+              <option value="Routing Bot">Routing Bot</option>
             </select>
             <select v-model="selectedUserGroup" class="filter-select">
               <option value="all">All Users/Groups</option>
@@ -877,6 +886,7 @@ const biggestSpike = computed(() => {
 
 // Usage History filters
 const selectedType = ref('all')
+const selectedAgent = ref('all')
 const selectedUserGroup = ref('all')
 const selectedMonth = ref('Dec')
 
@@ -899,6 +909,13 @@ const filteredUsageHistory = computed(() => {
       const entryType = entry.type.toLowerCase()
       const filterType = selectedType.value.toLowerCase()
       if (!entryType.includes(filterType)) {
+        return false
+      }
+    }
+
+    // Filter by agent
+    if (selectedAgent.value !== 'all') {
+      if (entry.agentName !== selectedAgent.value) {
         return false
       }
     }

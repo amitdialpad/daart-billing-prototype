@@ -1,8 +1,8 @@
 # Current State: Implementation Status
 
-**Last Updated**: December 5, 2025, 8:00 AM
+**Last Updated**: December 5, 2025, 8:00 PM
 **Project**: DAART Billing Prototypes (Scenario A & B)
-**Status**: ✅ Deployed & Production Ready (Updated with Dec 4th Josh Feedback)
+**Status**: ✅ Deployed & Production Ready (Updated with Scenario B Enhancements)
 
 ---
 
@@ -611,6 +611,82 @@ git push origin master      # Deploys automatically
 **Ledger Feel**: Google Sheets-style tables with light borders, clean typography
 
 **Control Panel Not Report**: Interface feels actionable, not documentary
+
+---
+
+## Recent Updates (December 5, 2025 - Afternoon/Evening)
+
+### Scenario B Enhancements - Spend Limit Management & Usage Alerts
+
+**Deployment**: Commit `b875ad0` - Pushed to production
+
+#### Phase 7: Manage Spend Limit (COMPLETE)
+- [x] **"Manage spend limit" link** - Subtle underlined text (not button) at bottom-right of Current Spend card
+- [x] **Inline editing panel** - Uses card → panel replacement pattern matching Other Services Settings
+- [x] **Josh's 6 refinements applied**:
+  1. Input shows current limit value (not placeholder)
+  2. Reduced vertical spacing by 20-25%
+  3. Short header: "Spend limit" (not "Spend Limit Settings")
+  4. Grouped Cancel/Save buttons as right-aligned pair
+  5. Remove limit as quiet grey text link (not button)
+  6. Helper text: "Soft limits trigger alerts; hard limits stop usage."
+- [x] **localStorage persistence** - Saves spend limit configuration across page refreshes
+- [x] **Defensive defaults** - Optional chaining prevents undefined values
+- [x] **Spend limit options**:
+  - Change limit amount
+  - Toggle between soft/hard limits
+  - Remove limit entirely (unlimited pay-as-you-go)
+
+**Files Modified**:
+- `/src/pages/ScenarioB.vue` (lines 29-32, 67-119, 513-517, 2248-2357)
+
+#### Phase 8: Usage Alerts Integration (COMPLETE)
+- [x] **Usage Alerts section** - Added INSIDE Other Services Settings (not separate)
+- [x] **Services included**: SMS/MMS, International, Fax only (NO AI Agent - uses spend limits)
+- [x] **Alert structure**:
+  - Email alerts at first threshold (80%)
+  - Services stop at second threshold (100%)
+- [x] **UI Pattern**: Black checkboxes, single column layout, FAFAFA background
+- [x] **Unified styling** - Changed Scenario A checkboxes from purple to black for consistency
+
+**Files Modified**:
+- `/src/pages/ScenarioB.vue` (lines 192-213, 1605-1670)
+- `/src/pages/ScenarioA.vue` (lines 2341-2356)
+- `/src/data/mockData.js` (lines 688-714)
+
+#### Phase 9: All Agents Filter (COMPLETE)
+- [x] **"All Agents" dropdown** - Added to Usage History filters
+- [x] **Filter options**: Support Bot Alpha/Beta/Gamma, Sales Bot A/B, Routing Bot
+- [x] **Capitalization fix**: "All channels" → "All Channels"
+- [x] **Filter logic**: Implemented agent filtering in computed property
+
+**Files Modified**:
+- `/src/pages/ScenarioB.vue` (lines 214-222, 620, 647-652)
+
+#### Phase 10: 2× Tooltip Fix (COMPLETE)
+- [x] **Tooltip wrapper pattern** - Replaced title attribute with CSS tooltip
+- [x] **Hover functionality** - Shows recharge reason on hover
+- [x] **Arrow pointer** - Added ::after pseudo-element for tooltip arrow
+- [x] **Wrapping fix** - Added white-space: nowrap to prevent line breaks
+
+**Files Modified**:
+- `/src/pages/ScenarioB.vue` (lines 257-262, 1144-1191)
+
+#### Phase 11: Visibility Condition Fixes (COMPLETE)
+- [x] **Trend card visibility** - Hides during spend limit and other services editing
+- [x] **Hero cards visibility** - Hides during both editing modes
+- [x] **Explicit conditions** - Changed from v-else-if to explicit v-if with both flags
+- [x] **Clean separation** - Only one view shows at a time
+
+**Files Modified**:
+- `/src/pages/ScenarioB.vue` (lines 10, 15, 68, 161)
+
+#### Design Decisions
+- **Inline Replacement**: Matches existing "Other Services Settings" pattern
+- **Subtle Actions**: Text links for secondary actions (per Josh's feedback)
+- **Defensive Programming**: Optional chaining and fallback defaults throughout
+- **Consistent Styling**: Black checkboxes unified across both scenarios
+- **Clear Separation**: Agentic AI uses spend limits, Other Services use credit alerts
 
 ---
 
