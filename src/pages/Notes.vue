@@ -4,12 +4,49 @@
       <div class="notes-content">
         <h1>Simplified Version of Abby's PRD</h1>
 
-        <div class="page-section">
+        <!-- Index -->
+        <div class="page-section index-section">
+          <h2>Document Index</h2>
+
+          <div class="index-grid">
+            <div class="index-column">
+              <h3>Original PRD Content</h3>
+              <ul class="index-list">
+                <li><a @click.prevent="scrollTo('document-overview')">Document Overview</a></li>
+                <li><a @click.prevent="scrollTo('core-pricing')">Core Pricing Model</a></li>
+                <li><a @click.prevent="scrollTo('billable-criteria')">What Makes a Conversation Billable?</a></li>
+                <li><a @click.prevent="scrollTo('not-billable')">What's NOT Billable (Free)</a></li>
+                <li><a @click.prevent="scrollTo('volume-discounts')">Tiered Volume Discounts</a></li>
+                <li><a @click.prevent="scrollTo('channel-switching')">Channel Switching Rules</a></li>
+                <li><a @click.prevent="scrollTo('cost-controls')">Product Protection (Cost Controls)</a></li>
+                <li><a @click.prevent="scrollTo('mvp-requirements')">MVP Product Requirements for GA</a></li>
+                <li><a @click.prevent="scrollTo('open-questions')">Open Questions (Still Unresolved)</a></li>
+                <li><a @click.prevent="scrollTo('contract-legal')">Contract & Legal</a></li>
+              </ul>
+            </div>
+
+            <div class="index-column">
+              <h3>Scenario Analysis</h3>
+              <ul class="index-list">
+                <li><a @click.prevent="scrollTo('scenario-comparison')">Scenario Comparison & Decision Framework</a></li>
+                <li><a @click.prevent="scrollTo('future-scenarios')">Long-Term Vision (Future Scenarios)</a></li>
+              </ul>
+
+              <h3 style="margin-top: 24px;">Implementation Updates</h3>
+              <ul class="index-list">
+                <li><a @click.prevent="scrollTo('josh-feedback')">Josh's Feedback (Dec 4, 2025)</a></li>
+                <li><a @click.prevent="scrollTo('billing-scenarios')"><strong>NEW:</strong> Billing Scenarios A, B, C, D (Dec 8, 2025)</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-section" id="document-overview">
           <h2>Document Overview</h2>
           <p>This PRD defines how Dialpad will bill customers for AI Agent conversations at GA (February 1, 2026). It establishes different rates for voice vs. digital conversations and outlines the complete billing model.</p>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="core-pricing">
           <h2>Core Pricing Model</h2>
 
           <h3>Rate Card:</h3>
@@ -21,7 +58,7 @@
           <p><strong>Why the difference?</strong> Voice costs Dialpad more (telephony + AI costs) vs. digital (just AI costs).</p>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="billable-criteria">
           <h2>What Makes a Conversation Billable?</h2>
 
           <p>A conversation is charged <strong>ONLY</strong> when <strong>ALL</strong> these criteria are met:</p>
@@ -52,7 +89,7 @@
           </ul>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="not-billable">
           <h2>What's NOT Billable (Free)</h2>
 
           <p><strong>Standard IVR routing</strong> without agentic skills:</p>
@@ -66,7 +103,7 @@
           <p><strong>The key:</strong> If no skill was executed, it's <strong>free</strong> - just routing doesn't count.</p>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="volume-discounts">
           <h2>Tiered Volume Discounts</h2>
 
           <p>Customers buy credits upfront with volume discounts:</p>
@@ -132,7 +169,7 @@
           <p><strong>Sales Strategy:</strong> Minimum 10K credits to contract (targeting MM/ENT customers).</p>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="channel-switching">
           <h2>Channel Switching Rules</h2>
 
           <p>If a customer switches channels mid-conversation:</p>
@@ -169,7 +206,7 @@
           <p><strong>Each channel = separate billable conversation</strong></p>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="cost-controls">
           <h2>Product Protection (Cost Controls)</h2>
 
           <p><strong>Built-in safeguards:</strong></p>
@@ -182,7 +219,7 @@
           </ol>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="mvp-requirements">
           <h2>MVP Product Requirements for GA</h2>
 
           <p>Customers need these features to <strong>manage usage</strong>:</p>
@@ -224,7 +261,7 @@
           </ul>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="open-questions">
           <h2>Open Questions (Still Unresolved)</h2>
 
           <ol>
@@ -235,7 +272,7 @@
           </ol>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="contract-legal">
           <h2>Contract & Legal</h2>
 
           <h3>Key contractual terms:</h3>
@@ -253,7 +290,7 @@
           </ul>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="scenario-comparison">
           <h2>Scenario Comparison & Decision Framework</h2>
 
           <h3>Detailed Comparison</h3>
@@ -483,7 +520,7 @@
           </div>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="future-scenarios">
           <h2>Long-Term Vision (Future Scenarios)</h2>
 
           <p>Document explores two approaches:</p>
@@ -516,7 +553,7 @@
           </ul>
         </div>
 
-        <div class="page-section">
+        <div class="page-section" id="josh-feedback">
           <h2>Summary of Changes Requested by Josh on Dec 4th 2025</h2>
 
           <ol>
@@ -608,6 +645,244 @@
             </li>
           </ol>
         </div>
+
+        <div class="page-section" id="billing-scenarios">
+          <h2>Implemented Billing Scenarios (December 8, 2025)</h2>
+
+          <p>Based on Abby's PRD and stakeholder feedback, we've built four distinct billing scenarios to explore different entitlement models and control mechanisms. Each scenario demonstrates a different approach to managing AI Agent costs and service consumption.</p>
+
+          <h3>Scenario A: Recurring Credits Only</h3>
+
+          <p><strong>Model:</strong> Single flexible credit pool used across all services</p>
+
+          <p><strong>What it does:</strong></p>
+          <ul>
+            <li>Customers purchase a recurring credit pool (e.g., $15,000/month)</li>
+            <li>Admins allocate credits across services (AI Agent Digital, AI Agent Voice, SMS, International, Fax)</li>
+            <li>Credits are shared and can be reallocated based on actual usage patterns</li>
+            <li>Hard stops at 100% of allocated budget prevent services from consuming more than their allocation</li>
+          </ul>
+
+          <p><strong>Key features:</strong></p>
+          <ul>
+            <li>Budget Snapshot with allocation controls</li>
+            <li>Usage Alerts with soft thresholds (80%) and hard stops (100%)</li>
+            <li>Rollover settings for recurring vs one-time credits</li>
+            <li>Expiring credits tracking (use-it-or-lose-it model)</li>
+          </ul>
+
+          <p><strong>Best for:</strong> Enterprise customers with diverse usage patterns who want flexibility to reallocate spend across services.</p>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entitlement</th>
+                  <th>Cap Mechanism</th>
+                  <th>Control Point</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>$15,000 recurring credit pool (shared)</td>
+                  <td>Hard stops at 100% of allocated budget</td>
+                  <td>Budget allocation per service</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Scenario B: Hybrid (Recurring + Committed Packs)</h3>
+
+          <p><strong>Model:</strong> Committed packs for AI Agent + recurring credit pool for other services</p>
+
+          <p><strong>What it does:</strong></p>
+          <ul>
+            <li>AI Agent services (Digital & Voice) use committed usage packs (e.g., 17,000 conversations prepaid)</li>
+            <li>Other services (SMS, International, Fax) draw from a separate recurring credit pool ($500,000)</li>
+            <li>Packs are consumed first, then recurring credits, then one-time credits, then overage charges apply</li>
+            <li>Dual cap system: pack depletion for AI Agent, credit hard stops for other services</li>
+          </ul>
+
+          <p><strong>Key features:</strong></p>
+          <ul>
+            <li>Committed Usage Packs table showing pack size, utilization, and rates</li>
+            <li>Budget Snapshot for recurring credit pool (SMS, International, Fax only)</li>
+            <li>Usage Alerts only for credit-based services (not for packs)</li>
+            <li>Clear draw-down priority: Packs → Recurring → One-time → Overage</li>
+          </ul>
+
+          <p><strong>Best for:</strong> Customers with predictable AI Agent usage who want volume discounts via packs, while maintaining flexibility for variable services.</p>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entitlement</th>
+                  <th>Cap Mechanism</th>
+                  <th>Control Point</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>17,000 conversation packs (AI Agent)</td>
+                  <td>Pack depletion (self-limiting)</td>
+                  <td>Pack size defines capacity</td>
+                </tr>
+                <tr>
+                  <td>$500,000 recurring credits (other services)</td>
+                  <td>Hard stops at 100% of allocated budget</td>
+                  <td>Budget allocation per service</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Why two systems?</strong> AI Agent packs are prepaid capacity (like buying a phone plan), so the pack size is the cap. Other services use the flexible credit pool and need explicit budget controls to prevent over-consumption.</p>
+
+          <h3>Scenario C: Committed Packs Only</h3>
+
+          <p><strong>Model:</strong> All services use committed usage packs (no flexible credit pool)</p>
+
+          <p><strong>What it does:</strong></p>
+          <ul>
+            <li>Customers purchase usage-specific packs for each service (e.g., 10,000 AI Digital conversations, 50,000 SMS messages)</li>
+            <li>Each pack is consumed independently—cannot share capacity across services</li>
+            <li>Hard caps at 95-98% of pack size prevent overage charges by stopping usage before pack depletes</li>
+            <li>When pack exhausts: either usage stops (if hard cap enabled) or overage charges apply at standard rates</li>
+          </ul>
+
+          <p><strong>Key features:</strong></p>
+          <ul>
+            <li>Usage by Pack Type table with Utilization, Rate, <strong>Hard Cap</strong>, and Status columns</li>
+            <li>Pack Coverage indicator showing which services have packs (5/6 services)</li>
+            <li>Overage Risk tracking for packs depleting faster than expected</li>
+            <li>Usage Alerts per pack with configurable soft alerts and hard caps</li>
+          </ul>
+
+          <p><strong>Best for:</strong> Enterprise customers with very predictable usage who want precise per-service control and maximum protection against surprise charges.</p>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entitlement</th>
+                  <th>Cap Mechanism</th>
+                  <th>Control Point</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>5 committed packs (usage-specific)</td>
+                  <td>Hard caps at 95-98% of pack size</td>
+                  <td>Optional per-pack overage prevention</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Hard Cap Explained (Scenario C only):</strong></p>
+          <ul>
+            <li><strong>Example:</strong> AI Agent Digital pack has 10,000 conversations with a 95% hard cap (9,500 conversations)</li>
+            <li><strong>Purpose:</strong> Stops usage at 9,500 to prevent overage charges, leaving 500-unit safety buffer</li>
+            <li><strong>Trade-off:</strong> Zero surprise costs vs potential service interruption until admin adds capacity</li>
+            <li><strong>Why below 100%?</strong> Buffer prevents accidental overage from in-flight requests or race conditions</li>
+          </ul>
+
+          <p><em><strong>Key difference from Scenario A/B:</strong> Scenario A and B have "hard stops" at 100% of <strong>allocated budget</strong> (budget control). Scenario C has "hard caps" at 95-98% of <strong>pack size</strong> (overage prevention). Different purposes, different mechanisms.</em></p>
+
+          <h3>Scenario D: Dynamic Tiered Rates (Pay-As-You-Go)</h3>
+
+          <p><strong>Model:</strong> Pay-as-you-go pricing with progressive volume discounts</p>
+
+          <p><strong>What it does:</strong></p>
+          <ul>
+            <li>No upfront commitment—customers pay per conversation at rates that decrease with volume</li>
+            <li>7 tiers from Starter (0-500 conversations) to Enterprise (50,001+)</li>
+            <li>Automatic tier upgrades as monthly usage increases</li>
+            <li>Monthly spend limits (soft or hard) prevent runaway costs</li>
+            <li>Tiers reset monthly (fresh start each billing period)</li>
+          </ul>
+
+          <p><strong>Key features:</strong></p>
+          <ul>
+            <li>Tier progression visualization showing current tier and progress to next tier</li>
+            <li>Rate card showing all 7 tiers with Digital/Voice rates and discount percentages</li>
+            <li>Forecast showing projected tier by month-end based on current pace</li>
+            <li>Spend limit management (soft vs hard limits)</li>
+          </ul>
+
+          <p><strong>Best for:</strong> Customers with variable usage who want flexibility, no upfront capital commitment, and automatic volume discounts.</p>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entitlement</th>
+                  <th>Cap Mechanism</th>
+                  <th>Control Point</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Unlimited pay-as-you-go (no prepayment)</td>
+                  <td>Monthly spend limit (soft or hard)</td>
+                  <td>Dollar-based cap, not usage cap</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>⚠️ Important Note:</strong> Scenario D represents a different billing philosophy than Scenarios A, B, and C. After initial exploration, <strong>Abby indicated we should not continue developing this model</strong>. The prototype remains for reference and comparison purposes, but the focus has shifted to committed capacity models (A, B, C) which align better with Dialpad's enterprise-first strategy and existing billing infrastructure.</p>
+
+          <p><strong>Why Abby said no:</strong> Dynamic tiered rates introduce monthly resets, variable revenue forecasting complexity, and potential "gaming" behavior at tier boundaries. The committed models (A, B, C) provide more predictable revenue for Dialpad and clearer cost expectations for customers.</p>
+
+          <h3>Summary Comparison</h3>
+
+          <div class="pricing-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Core Model</th>
+                  <th>Flexibility</th>
+                  <th>Predictability</th>
+                  <th>Key Control</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>A: Recurring Credits</strong></td>
+                  <td>Shared credit pool</td>
+                  <td>High (reallocate anytime)</td>
+                  <td>Medium (pool shared)</td>
+                  <td>Budget allocation</td>
+                </tr>
+                <tr>
+                  <td><strong>B: Hybrid</strong></td>
+                  <td>Packs + Credits</td>
+                  <td>Medium (dual system)</td>
+                  <td>High (separate pools)</td>
+                  <td>Dual cap system</td>
+                </tr>
+                <tr>
+                  <td><strong>C: Packs Only</strong></td>
+                  <td>Usage-specific packs</td>
+                  <td>Low (no sharing)</td>
+                  <td>Highest (locked rates)</td>
+                  <td>Hard caps per pack</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><strong>D: Tiered Rates</strong></td>
+                  <td>Pay-as-you-go</td>
+                  <td>Highest (unlimited)</td>
+                  <td>Low (variable cost)</td>
+                  <td>Spend limit</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </AdminShell>
@@ -615,6 +890,13 @@
 
 <script setup>
 import AdminShell from '../components/layout/AdminShell.vue'
+
+const scrollTo = (id) => {
+  const element = document.getElementById(id)
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
 </script>
 
 <style scoped>
@@ -738,5 +1020,66 @@ strong {
 em {
   font-style: italic;
   color: #888888;
+}
+
+/* Index Section */
+.index-section {
+  background-color: #F9FAFB;
+  border: 2px solid #E5E5E5;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.index-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .index-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.index-column h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #D1D5DB;
+}
+
+.index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.index-list li {
+  margin-bottom: 8px;
+}
+
+.index-list a {
+  color: #6E4AE4;
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1.5;
+  display: block;
+  padding: 4px 0;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.index-list a:hover {
+  color: #5A3ABD;
+  text-decoration: underline;
+}
+
+.index-list a strong {
+  color: #10B981;
+  font-weight: 600;
 }
 </style>
