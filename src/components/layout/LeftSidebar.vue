@@ -56,7 +56,9 @@ const navItems = ref([
     onClick: () => { billingExpanded.value = !billingExpanded.value },
     subItems: [
       { label: 'Scenario A', path: '/scenario-a' },
-      { label: 'Scenario B', path: '/scenario-b' }
+      { label: 'Scenario B', path: '/scenario-b' },
+      { label: 'Scenario C', path: '/scenario-c' },
+      { label: 'Scenario D', path: '/scenario-d' }
     ]
   },
   { label: 'Launchpad', active: false },
@@ -69,7 +71,6 @@ const navItems = ref([
 
 <style scoped>
 .left-sidebar {
-  width: 240px;
   background-color: #FFFFFF;
   border-right: 1px solid #E5E5E5;
   height: 100vh;

@@ -2,13 +2,15 @@
   <AdminShell>
     <div class="scenario-page">
       <div class="page-header">
+        <div class="mode-indicator">Scenario A · Recurring Credits</div>
         <h1>Credits and Usage</h1>
-        <p class="subtitle">Scenario A: Upfront Credits + Budget Allocation</p>
+        <h2 class="scenario-label">Recurring Credits</h2>
+        <p class="subtitle">Single flexible credit pool used across all services.</p>
       </div>
 
       <!-- Trend / Prediction Card - Small, separate, above hero cards -->
-      <div v-if="!isEditingBudget" class="trend-card">
-        Used <strong>${{ data.used.toLocaleString() }}</strong> by day 10 (expected <strong>~$5,000</strong>) · Depletes by <strong>{{ data.forecast.projectedRunOutDate }}</strong> ({{ data.forecast.daysRemaining }} days)
+      <div v-if="!isEditingBudget && !isEditingRollover" class="trend-card">
+        Used <strong>${{ trendCardData.actualSpend.toLocaleString() }}</strong> by day {{ trendCardData.currentDay }} (expected <strong>~${{ trendCardData.expectedSpend.toLocaleString() }}</strong>) · Depletes by <strong>{{ trendCardData.depletionDate }}</strong> ({{ trendCardData.daysRemaining }} days)
       </div>
 
       <!-- Hero Cards - One Money View (State) -->
@@ -17,66 +19,99 @@
           <!-- 1. Total Remaining -->
           <div class="hero-card hero-card-primary">
             <div class="hero-header">
-              <span class="hero-label">REMAINING CAPACITY</span>
+              <span class="hero-label">
+                REMAINING CAPACITY
+                <span class="info-icon-wrapper">
+                  <DtIconInfo class="info-icon" />
+                  <span class="info-tooltip">Credits remaining in your flexible recurring pool. Used across all services including AI Agent, SMS, calling, and more.</span>
+                </span>
+              </span>
               <span class="status-badge status-on-track">On track</span>
             </div>
             <div class="hero-number">${{ data.available.toLocaleString() }}</div>
             <div class="hero-interpretation">Credits left before buffer activates</div>
-            <div class="hero-commit">Of ${{ data.totalCredits.toLocaleString() }} monthly commit · Renews {{ data.package.renewalDate }}</div>
+            <div class="hero-commit">Of ${{ data.totalCredits.toLocaleString() }} monthly recurring credits · Renews {{ data.package.renewalDate }}</div>
             <button class="hero-action-btn" @click="handleAddCredits">Add credits</button>
           </div>
 
           <!-- 2. Current Spend -->
           <div class="hero-card hero-card-primary">
             <div class="hero-header">
-              <span class="hero-label">CURRENT SPEND</span>
+              <span class="hero-label">
+                CURRENT SPEND
+                <span class="info-icon-wrapper">
+                  <DtIconInfo class="info-icon" />
+                  <span class="info-tooltip">Month-to-date spend from your recurring credit pool. Tracking $4,000 over expected pace based on daily burn rate.</span>
+                </span>
+              </span>
               <span class="status-badge status-warning">Trending high</span>
             </div>
             <div class="hero-number">${{ data.used.toLocaleString() }}</div>
-            <div class="hero-micro-trend">↑ $4,000 over expected pace</div>
-            <div class="hero-interpretation">Ahead of expected for day 10</div>
+            <div class="hero-interpretation">$4,000 over expected pace</div>
             <div class="hero-commit">Month-to-date across all usage</div>
+            <button class="hero-action-btn">View breakdown</button>
           </div>
 
           <!-- 3. Primary Category Budget -->
-          <div class="hero-card">
+          <div class="hero-card hero-card-primary">
             <div class="hero-header">
-              <span class="hero-label">AGENTIC BUDGET</span>
+              <span class="hero-label">
+                AGENTIC BUDGET
+                <span class="info-icon-wrapper">
+                  <DtIconInfo class="info-icon" />
+                  <span class="info-tooltip">Budget allocated specifically for AI Agent usage (digital and voice channels). Part of your overall recurring credit pool.</span>
+                </span>
+              </span>
               <span class="status-badge status-on-track">On track</span>
             </div>
-            <div class="hero-number">{{ data.budgetAllocation.aiAgentDigital.remaining.toLocaleString() }}</div>
-            <div class="hero-interpretation">Locked rate: 80¢/conversation · ≈ {{ data.budgetAllocation.aiAgentDigital.remaining.toLocaleString() }} conversations remaining</div>
-            <div class="hero-commit">Of {{ data.budgetAllocation.aiAgentDigital.allocated.toLocaleString() }} allocated · On track for month-end</div>
+            <div class="hero-number">${{ data.budgetAllocation.aiAgentDigital.remaining.toLocaleString() }}</div>
+            <div class="hero-interpretation">Credits allocated for Agentic usage this month</div>
+            <div class="hero-commit">Of ${{ data.budgetAllocation.aiAgentDigital.allocated.toLocaleString() }} allocated · On track for month-end</div>
+            <button class="hero-action-btn">View details</button>
           </div>
 
           <!-- 4. Expiring Credits Alert -->
-          <div class="hero-card" v-if="data.expiration.expiring > 0">
+          <div class="hero-card hero-card-primary" v-if="data.expiration.expiring > 0">
             <div class="hero-header">
-              <span class="hero-label">EXPIRING CREDITS</span>
+              <span class="hero-label">
+                EXPIRING CREDITS
+                <span class="info-icon-wrapper">
+                  <DtIconInfo class="info-icon" />
+                  <span class="info-tooltip">One-time credits used only after recurring credits are exhausted. Expired credits are lost and cannot be recovered. Use them before expiration or contact your Account Manager to request an extension.</span>
+                </span>
+              </span>
               <span class="status-badge status-alert">Expires soon</span>
             </div>
             <div class="hero-number">${{ data.expiration.expiring.toLocaleString() }}</div>
             <div class="hero-interpretation">One-time credits · <strong>27 days</strong> remaining</div>
-            <div class="hero-sequencing">Used only after monthly credits run out.</div>
-            <div class="hero-commit">
-              Expires {{ data.expiration.expirationDate }}
-              <span class="info-icon-wrapper">
-                <DtIconInfo class="info-icon" />
-                <span class="info-tooltip">Expired credits are lost and cannot be recovered. Use them before expiration or contact your Account Manager to request an extension.</span>
-              </span>
-            </div>
+            <div class="hero-commit">Expires {{ data.expiration.expirationDate }}</div>
             <button class="hero-action-btn" @click="openRolloverSettings">Manage rollover</button>
           </div>
         </div>
+      </div>
 
-        <!-- Budget Snapshot - Full Width -->
+      <!-- Budget Snapshot - Separate Card -->
+      <div class="card">
         <div v-if="!isEditingBudget && !isEditingRollover" class="budget-snapshot-full">
           <div class="budget-snapshot-header">
             <div class="budget-header-left">
-              <h3>Budget snapshot</h3>
-              <span class="overall-trend">Overall pace: ↑ High usage trend</span>
+              <h3>
+                Budget Snapshot
+                <span class="info-icon-wrapper">
+                  <DtIconInfo class="info-icon" />
+                  <span class="info-tooltip">Budgets apply to your recurring credits pool. Usage reflects draw-down from the recurring credit pool across all services.</span>
+                </span>
+              </h3>
+              <span class="overall-trend">Usage trending faster than expected</span>
             </div>
-            <button class="btn-export" @click="openBudgetSettings">Adjust allocation</button>
+            <div class="budget-header-actions">
+              <button class="btn-export" @click="openBudgetSettings">Adjust allocation</button>
+            </div>
+          </div>
+
+          <div class="budget-priority-row">
+            <span class="priority-label">Draw-down priority:</span>
+            <span class="priority-flow">Recurring credits → One-time credits → Overage</span>
           </div>
 
           <table class="budget-table-ledger">
@@ -90,17 +125,71 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, key) in data.budgetAllocation" :key="key" class="budget-row">
-                <td class="td-category">{{ item.label }}</td>
-                <td class="td-alloc-used">{{ item.allocated.toLocaleString() }} · {{ item.used.toLocaleString() }} used</td>
-                <td class="td-remaining">${{ item.remaining.toLocaleString() }}</td>
-                <td class="td-trend">
-                  <span class="sparkline">▂▃▅▇</span> {{ getShortVariance(item, key) }}
-                </td>
-                <td class="td-status">
-                  <span class="status-dot" :class="getStatusClass(item)">●</span> {{ getStatusText(item) }}
-                </td>
-              </tr>
+              <template v-for="(item, key) in data.budgetAllocation" :key="key">
+                <tr class="budget-row budget-row-clickable" @click="toggleBudgetRow(key)">
+                  <td class="td-category">{{ item.label }}</td>
+                  <td class="td-alloc-used">{{ item.allocated.toLocaleString() }} · {{ item.used.toLocaleString() }} used</td>
+                  <td class="td-remaining">${{ item.remaining.toLocaleString() }}</td>
+                  <td class="td-trend">
+                    <span class="sparkline">▂▃▅▇</span> {{ getShortVariance(item, key) }}
+                  </td>
+                  <td class="td-status">
+                    <span class="status-dot" :class="getStatusClass(item)">●</span> {{ getStatusText(item) }}
+                    <span class="row-chevron" :class="{ 'chevron-expanded': expandedBudgetRow === key }">›</span>
+                  </td>
+                </tr>
+
+                <!-- Expanded row content -->
+                <tr v-if="expandedBudgetRow === key" class="expanded-row">
+                  <td colspan="5" class="expanded-content">
+                    <!-- Agentic rows: Agent breakdown table -->
+                    <div v-if="key === 'aiAgentDigital' || key === 'aiAgentVoice'" class="agent-breakdown">
+                      <h4 class="breakdown-title">▼ Agent breakdown</h4>
+                      <table class="agent-table">
+                        <thead>
+                          <tr>
+                            <th>Agent</th>
+                            <th>Spend</th>
+                            <th>Change</th>
+                            <th>Conversations</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="agent in data.topAgentsSummary.filter(a => a.type === (key === 'aiAgentDigital' ? 'digital' : 'voice'))" :key="agent.name">
+                            <td>{{ agent.name }}</td>
+                            <td>${{ agent.cost.toLocaleString() }}</td>
+                            <td :class="{ 'change-up': getTrendPercent(agent) > 0, 'change-down': getTrendPercent(agent) < 0 }">
+                              {{ getTrendPercent(agent) > 0 ? '↑' : getTrendPercent(agent) < 0 ? '↓' : '' }}{{ Math.abs(getTrendPercent(agent)) }}%
+                            </td>
+                            <td>{{ agent.conversations.toLocaleString() }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <a href="#" class="drill-down-link">View full agent report →</a>
+                    </div>
+
+                    <!-- Non-agentic rows: Billing summary -->
+                    <div v-else class="billing-summary">
+                      <h4 class="breakdown-title">▼ Billing summary</h4>
+                      <ul class="summary-list">
+                        <li v-if="key === 'sms'">{{ item.used }} messages sent</li>
+                        <li v-if="key === 'sms'">Avg cost/message: $0.02</li>
+                        <li v-if="key === 'sms'">Top sources: Support flows</li>
+
+                        <li v-if="key === 'international'">{{ item.used }} minutes</li>
+                        <li v-if="key === 'international'">Avg cost/min: $0.18</li>
+                        <li v-if="key === 'international'">Top destinations: India, UK</li>
+
+                        <li v-if="key === 'fax'">{{ Math.floor(item.used / 5) }} pages sent</li>
+                        <li v-if="key === 'fax'">Stable usage pattern</li>
+                      </ul>
+                      <a href="#" class="drill-down-link">
+                        {{ key === 'sms' ? 'View SMS analytics →' : key === 'international' ? 'View call breakdown →' : 'View fax details →' }}
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -152,25 +241,12 @@
 
         <!-- Rollover Settings Panel -->
         <div v-if="isEditingRollover" class="rollover-settings-panel">
-          <div class="rollover-header">
-            <h2>Manage rollover</h2>
-            <p class="rollover-subtitle">Control how renewing credits, one-time credits, and auto-top-ups behave</p>
+          <div class="trend-card" style="margin-bottom: 24px;">
+            Note: One-time credits are used after recurring credits. This order cannot be changed.
           </div>
 
-          <!-- Section 1: Consumption Order -->
-          <div class="rollover-section">
-            <h3 class="rollover-section-title">Consumption order</h3>
-            <div class="rollover-radio-group">
-              <label class="rollover-radio-label">
-                <input type="radio" v-model="editableRollover.consumptionOrder" value="renewing-first" />
-                <span>Use renewing credits first</span>
-              </label>
-              <label class="rollover-radio-label">
-                <input type="radio" v-model="editableRollover.consumptionOrder" value="onetime-first" />
-                <span>Use one-time credits first</span>
-              </label>
-            </div>
-            <p class="rollover-help-text">One-time credits are used only after your monthly renewing pool is exhausted.</p>
+          <div class="rollover-header">
+            <h2>Manage rollover settings</h2>
           </div>
 
           <!-- Section 2: Auto-Renew -->
@@ -222,6 +298,7 @@
                 <span>Auto-renew silently</span>
               </label>
             </div>
+            <p class="rollover-help-text">Auto top-up applies to your recurring credit pool.</p>
           </div>
 
           <!-- Section 3: One-Time Credit Expiration -->
@@ -276,6 +353,7 @@
                 <span>Allow usage and bill at overage rates (if supported)</span>
               </label>
             </div>
+            <p class="rollover-help-text">Blocking usage prevents unplanned charges.</p>
           </div>
 
           <!-- Validation Errors -->
@@ -378,60 +456,10 @@
         </table>
       </div>
 
-      <!-- Team Consumption Summary -->
-      <div v-if="!isEditingBudget && !isEditingRollover" class="card">
-        <div class="summary-header-row">
-          <div>
-            <h2>Agent Consumption</h2>
-            <div class="header-controls">
-              <select class="filter-select-small">
-                <option>Dec 2025</option>
-                <option>Nov 2025</option>
-                <option>Oct 2025</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Alert for biggest spike -->
-        <div v-if="biggestSpike" class="consumption-alert">
-          <span class="alert-icon">⚠️</span>
-          <span class="alert-text">
-            <strong>{{ biggestSpike.name }}</strong> costs increased <strong>{{ biggestSpike.change }}%</strong> this month
-          </span>
-        </div>
-
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Agent</th>
-              <th class="text-right">Spend</th>
-              <th class="text-right">Change</th>
-              <th class="text-right">Conversations</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="member in topFiveMembers" :key="member.name">
-              <td>
-                <span class="trend-indicator" :class="member.trend">●</span>
-                {{ member.name }}
-              </td>
-              <td class="text-right">${{ member.cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</td>
-              <td class="text-right">
-                <span class="trend-value" :class="member.trend">
-                  {{ getTrendSymbol(member) }}{{ Math.abs(getTrendPercent(member)) }}%
-                </span>
-              </td>
-              <td class="text-right">{{ member.conversations.toLocaleString() }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
       <!-- Usage Alerts -->
       <div v-if="!isEditingBudget && !isEditingRollover" class="card">
         <h2>Usage Alerts</h2>
-        <p class="section-subtitle">Email alerts at first threshold • Services stop at second threshold</p>
+        <p class="section-subtitle">Alerts appear in Dialpad and via email • Alerts at first threshold • Services stop at second threshold</p>
 
         <div class="alerts-list">
           <div v-for="(limit, key) in data.limits" :key="key" class="alert-item">
@@ -629,11 +657,17 @@ const hasRolloverValidationError = computed(() => {
 
 // Validation
 const totalAllocated = computed(() => {
-  if (!isEditingBudget.value) return 0
-  return Object.values(editableBudget.value).reduce((sum, item) => {
-    const allocated = Number(item.allocated) || 0
-    return sum + allocated
-  }, 0)
+  if (isEditingBudget.value) {
+    return Object.values(editableBudget.value).reduce((sum, item) => {
+      const allocated = Number(item.allocated) || 0
+      return sum + allocated
+    }, 0)
+  } else {
+    return Object.values(data.value.budgetAllocation).reduce((sum, item) => {
+      const allocated = Number(item.allocated) || 0
+      return sum + allocated
+    }, 0)
+  }
 })
 
 const remainingUnallocated = computed(() => {
@@ -654,11 +688,6 @@ const hasValidationError = computed(() => {
   }
 
   return false
-})
-
-// Top 5 members for billing page summary (using realistic mock data)
-const topFiveMembers = computed(() => {
-  return data.value.topAgentsSummary.slice(0, 5)
 })
 
 // Calculate trend percentage
@@ -871,18 +900,53 @@ const getShortVariance = (item, key) => {
   }
 }
 
-// Find biggest spike for alert
-const biggestSpike = computed(() => {
-  const spikes = data.value.topAgentsSummary
-    .map(agent => ({
-      name: agent.name,
-      change: getTrendPercent(agent)
-    }))
-    .filter(agent => agent.change > 20) // Only show if > 20% increase
-    .sort((a, b) => b.change - a.change)
+// Dynamic trend card calculations
+const trendCardData = computed(() => {
+  const today = new Date()
+  const currentDayOfMonth = today.getDate()
+  const year = today.getFullYear()
+  const month = today.getMonth()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
 
-  return spikes.length > 0 ? spikes[0] : null
+  // Monthly budget
+  const monthlyBudget = data.value.totalCredits || 15000
+
+  // Calculate expected spend to date
+  const expectedDailyBurn = monthlyBudget / daysInMonth
+  const expectedSpendToDate = Math.round(expectedDailyBurn * currentDayOfMonth)
+
+  // Calculate actual spend (trending 1.8x higher for demo)
+  const trendMultiplier = 1.8
+  const actualSpend = Math.round(expectedSpendToDate * trendMultiplier)
+
+  // Calculate depletion
+  const remaining = monthlyBudget - actualSpend
+  const actualDailyBurn = actualSpend / currentDayOfMonth
+  const daysUntilDepletion = Math.floor(remaining / actualDailyBurn)
+
+  // Calculate depletion date
+  const depletionDate = new Date(today)
+  depletionDate.setDate(today.getDate() + daysUntilDepletion)
+
+  // Format depletion date
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const depletionDateStr = `${monthNames[depletionDate.getMonth()]} ${depletionDate.getDate()}, ${depletionDate.getFullYear()}`
+
+  return {
+    currentDay: currentDayOfMonth,
+    actualSpend,
+    expectedSpend: expectedSpendToDate,
+    depletionDate: depletionDateStr,
+    daysRemaining: daysUntilDepletion
+  }
 })
+
+// Budget row expansion
+const expandedBudgetRow = ref(null)
+
+const toggleBudgetRow = (key) => {
+  expandedBudgetRow.value = expandedBudgetRow.value === key ? null : key
+}
 
 // Usage History filters
 const selectedType = ref('all')
@@ -957,17 +1021,33 @@ const faqExpanded = ref({
 
 <style scoped>
 .scenario-page {
-  max-width: 1200px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
 .page-header {
   margin-bottom: 24px;
+  position: relative;
 }
 
-h1 {
-  font-size: 32px;
+.mode-indicator {
+  font-size: 12px;
   font-weight: 600;
+  color: #6E4AE4;
+  background-color: #F3F0FF;
+  padding: 4px 12px;
+  border-radius: 12px;
+  display: inline-block;
   margin-bottom: 8px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin: 8px 0 4px 0;
 }
 
 h2 {
@@ -976,10 +1056,17 @@ h2 {
   margin-bottom: 16px;
 }
 
-.subtitle {
+.scenario-label {
+  font-size: 16px;
+  font-weight: 500;
   color: #666666;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
   font-size: 14px;
-  margin-bottom: 8px;
+  color: #888888;
+  margin: 0;
 }
 
 .description {
@@ -992,8 +1079,9 @@ h2 {
   background-color: #FFFFFF;
   border: 1px solid #E5E5E5;
   border-radius: 4px;
-  padding: 24px;
+  padding: 16px;
   margin-bottom: 24px;
+  overflow: visible;
 }
 
 .card-row {
@@ -1061,7 +1149,7 @@ h2 {
 .info-icon {
   width: 16px;
   height: 16px;
-  cursor: help;
+  cursor: pointer;
   opacity: 0.6;
   transition: opacity 0.2s ease;
   color: #666666;
@@ -1089,6 +1177,9 @@ h2 {
   z-index: 1000;
   transition: opacity 0.3s ease, visibility 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
 }
 
 .info-tooltip::after {
@@ -1278,12 +1369,23 @@ h2 {
 /* Hero Cards Grid */
 .hero-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
-  margin-bottom: 24px;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 640px) {
+  .hero-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .hero-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
   .hero-cards-grid {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -1327,6 +1429,7 @@ h2 {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #666666;
+  white-space: nowrap;
 }
 
 .hero-number {
@@ -1368,7 +1471,6 @@ h2 {
 }
 
 .status-on-track {
-  background-color: #E8F5E9;
   color: #2E7D32;
 }
 
@@ -1453,7 +1555,7 @@ h2 {
 }
 
 .hero-action-btn {
-  margin-top: 12px;
+  margin-top: auto;
   padding: 6px 12px;
   background-color: #FFFFFF;
   border: 1px solid #CCCCCC;
@@ -1463,6 +1565,13 @@ h2 {
   cursor: pointer;
   color: #1C1C1C;
   transition: all 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-card:hover .hero-action-btn {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .hero-action-btn:hover {
@@ -1499,6 +1608,117 @@ h2 {
 
 .budget-table-ledger tbody tr {
   border-bottom: 1px solid #eee;
+}
+
+.budget-row-clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.budget-row-clickable:hover {
+  background-color: #F9F9F9;
+}
+
+.row-chevron {
+  margin-left: 8px;
+  color: #CCCCCC;
+  font-size: 18px;
+  opacity: 0;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.budget-row-clickable:hover .row-chevron {
+  opacity: 1;
+  color: #666666;
+}
+
+.chevron-expanded {
+  opacity: 1 !important;
+  color: #666666 !important;
+  transform: rotate(90deg);
+}
+
+.expanded-row {
+  background-color: #FAFAFA;
+}
+
+.expanded-content {
+  padding: 16px 24px !important;
+}
+
+.agent-breakdown,
+.billing-summary {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.breakdown-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666666;
+  margin: 0 0 12px 0;
+}
+
+.agent-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.agent-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888888;
+  padding: 8px 12px;
+  border-bottom: 1px solid #E5E5E5;
+}
+
+.agent-table td {
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #1C1C1C;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.agent-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.change-up {
+  color: #F57C00;
+}
+
+.change-down {
+  color: #10B981;
+}
+
+.billing-summary {
+  padding: 8px 0;
+}
+
+.summary-list {
+  list-style: disc;
+  margin: 0 0 12px 20px;
+  padding: 0;
+}
+
+.summary-list li {
+  font-size: 13px;
+  color: #666666;
+  margin-bottom: 6px;
+  line-height: 1.5;
 }
 
 .budget-table-ledger td {
@@ -1542,12 +1762,6 @@ h2 {
 
 /* Budget Snapshot Full Width */
 .budget-snapshot-full {
-  background-color: #FFFFFF;
-  border: 1px solid #E5E5E5;
-  border-radius: 8px;
-  padding: 24px;
-  margin-top: 24px;
-  margin-bottom: 24px;
 }
 
 .budget-snapshot-header {
@@ -1561,6 +1775,12 @@ h2 {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.budget-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .budget-snapshot-header h3 {
@@ -1600,6 +1820,126 @@ h2 {
   color: #666666;
   margin-bottom: 20px;
   line-height: 1.5;
+}
+
+.budget-snapshot-description {
+  font-size: 13px;
+  color: #666666;
+  margin: 12px 0 8px 0;
+  line-height: 1.5;
+}
+
+.budget-snapshot-context {
+  font-size: 13px;
+  color: #666666;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.budget-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background-color: #F9F9F9;
+  border-radius: 4px;
+}
+
+.budget-summary-label {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
+}
+
+.budget-summary-value {
+  font-size: 14px;
+  color: #1C1C1C;
+  font-weight: 600;
+}
+
+.budget-priority-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 20px 0;
+  padding: 8px 12px;
+  background-color: #FFF9E6;
+  border-radius: 4px;
+  border-left: 3px solid #F5C000;
+}
+
+.priority-label {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 500;
+}
+
+.priority-flow {
+  font-size: 13px;
+  color: #1C1C1C;
+  font-weight: 500;
+}
+
+.budget-footer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E5E5;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.legend-title {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 600;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666666;
+}
+
+.trend-helper {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.helper-label {
+  font-size: 13px;
+  color: #666666;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.helper-text {
+  font-size: 13px;
+  color: #666666;
+  line-height: 1.5;
+}
+
+.drill-down-link {
+  font-size: 14px;
+  color: #6E4AE4;
+  text-decoration: none;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.drill-down-link:hover {
+  text-decoration: underline;
 }
 
 .allocation-grid {
@@ -1877,6 +2217,23 @@ h2 {
 
 .btn-export:hover {
   background-color: #F9F9F9;
+}
+
+.btn-secondary-outline {
+  padding: 6px 12px;
+  background-color: transparent;
+  border: 1px solid #DDDDDD;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #666666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary-outline:hover {
+  background-color: #F9F9F9;
+  border-color: #CCCCCC;
+  color: #333333;
 }
 
 .data-table {
