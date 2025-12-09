@@ -31,6 +31,7 @@
             <div class="hero-number">${{ data.available.toLocaleString() }}</div>
             <div class="hero-interpretation">Credits left before buffer activates</div>
             <div class="hero-commit">Of ${{ data.totalCredits.toLocaleString() }} monthly recurring credits · Renews {{ data.package.renewalDate }}</div>
+            <div class="hero-commit">Hard cap: Alert at ${{ Math.round(data.totalCredits * 0.90).toLocaleString() }} (90%) · Stop at ${{ data.totalCredits.toLocaleString() }} (100%)</div>
             <button class="hero-action-btn" @click="handleAddCredits">Add credits</button>
           </div>
 
@@ -56,7 +57,7 @@
           <div class="hero-card hero-card-primary">
             <div class="hero-header">
               <span class="hero-label">
-                AGENTIC BUDGET
+                AGENTIC CREDITS
                 <span class="info-icon-wrapper">
                   <DtIconInfo class="info-icon" />
                   <span class="info-tooltip">Budget allocated specifically for AI Agent usage (digital and voice channels). Part of your overall recurring credit pool.</span>

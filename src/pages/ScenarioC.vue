@@ -126,8 +126,11 @@
               <td class="text-right">{{ Math.round((pack.used / pack.packSize) * 100) }}%</td>
               <td class="text-right">${{ pack.rate }} / {{ pack.unit }}</td>
               <td class="text-right">
-                <span v-if="pack.hardCap" class="hard-cap-badge">{{ pack.hardCap.toLocaleString() }}</span>
-                <span v-else class="no-cap">—</span>
+                <div v-if="pack.hardCapEnabled" class="hard-cap-info">
+                  <div class="hard-cap-line">Alert: {{ pack.softAlertPercent }}%</div>
+                  <div class="hard-cap-line">Stop: {{ pack.hardStopPercent }}%</div>
+                </div>
+                <span v-else class="no-cap-text">No cap</span>
               </td>
               <td class="text-right">
                 <span class="status-dot" :class="getPackStatusClass(pack)">●</span>
@@ -138,8 +141,7 @@
         </table>
 
         <p class="pack-footer-note">
-          Packs reset at the end of your billing period (contract-based). Unused units may roll over or expire based on your agreement.
-          Contact your account manager to add packs for additional services or adjust capacities.
+          <strong>No recurring credit pool.</strong> Usage beyond packs is billed as overage unless a hard cap is set. Packs reset at billing period end. Contact your account manager to add packs or adjust capacities.
         </p>
       </div>
 
@@ -319,31 +321,17 @@ import { DtIconInfo } from '@dialpad/dialtone-icons/vue3'
 // Scenario C specific data - committed packs only, no recurring credits
 const committedPacks = ref([
   {
-    type: 'aiAgentDigital',
-    label: 'AI Agent (Digital)',
-    packSize: 10000,
-    used: 6234,
-    remaining: 3766,
-    rate: '1.59',
+    type: 'aiAgent',
+    label: 'Agentic Credits',
+    packSize: 17000,
+    used: 9125,
+    remaining: 7875,
+    rate: '1.19',
     unit: 'conv',
     softAlertPercent: 80,
     hardCapEnabled: true,
     hardStopPercent: 95,
-    hardCap: 9500,
-    alertsEnabled: true
-  },
-  {
-    type: 'aiAgentVoice',
-    label: 'AI Agent (Voice)',
-    packSize: 7000,
-    used: 2891,
-    remaining: 4109,
-    rate: '0.79',
-    unit: 'conv',
-    softAlertPercent: 80,
-    hardCapEnabled: false,
-    hardStopPercent: 0,
-    hardCap: null,
+    hardCap: 16150,
     alertsEnabled: true
   },
   {
@@ -391,7 +379,7 @@ const committedPacks = ref([
 ])
 
 // All possible services
-const allServices = ['AI Agent (Digital)', 'AI Agent (Voice)', 'SMS/MMS', 'Toll-free Voice', 'International Calling', 'Fax']
+const allServices = ['Agentic Credits', 'SMS/MMS', 'Toll-free Voice', 'International Calling', 'Fax']
 
 // Services without packs
 const servicesWithoutPacks = computed(() => {
@@ -871,6 +859,23 @@ const faqExpanded = ref({
   border-radius: 3px;
   font-size: 11px;
   font-weight: 600;
+}
+
+.hard-cap-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hard-cap-line {
+  font-size: 11px;
+  color: #666666;
+  line-height: 1.3;
+}
+
+.no-cap-text {
+  color: #CCCCCC;
+  font-size: 12px;
 }
 
 .no-cap {

@@ -176,7 +176,7 @@ export const mockData = {
         allocated: 7000,
         used: 4000,
         remaining: 3000,
-        label: 'AI Agent (Digital)',
+        label: 'Agentic Credits (Digital)',
         unit: 'AI Conversations credits',
         unitType: 'conversations'
       },
@@ -184,7 +184,7 @@ export const mockData = {
         allocated: 6000,
         used: 3500,
         remaining: 2500,
-        label: 'AI Agent (Voice)',
+        label: 'Agentic Credits (Voice)',
         unit: 'AI Conversations credits',
         unitType: 'conversations'
       },
@@ -330,71 +330,30 @@ export const mockData = {
 
     // Top AI Agents consumption summary (realistic monthly data)
     topAgentsSummary: [
-      // Digital agents - sum to $4000 (aiAgentDigital.used)
+      // 3 realistic agents - sum to 5,610 conversations (33% of 17K pack)
       {
-        name: 'Support Bot Alpha',
+        name: 'Customer Support Agent',
         type: 'digital',
-        conversations: 755,
-        cost: 1200,
-        previousCost: 993,
+        conversations: 3300,
+        cost: 4158,  // 3,300 × $1.26
+        previousCost: 3960,
         trend: 'up'
       },
       {
-        name: 'Digital Sales Bot',
-        type: 'digital',
-        conversations: 692,
-        cost: 1100,
-        previousCost: 910,
-        trend: 'up'
-      },
-      {
-        name: 'Support Bot Beta',
-        type: 'digital',
-        conversations: 597,
-        cost: 950,
-        previousCost: 940,
-        trend: 'up'
-      },
-      {
-        name: 'Marketing Bot',
-        type: 'digital',
-        conversations: 472,
-        cost: 750,
-        previousCost: 680,
-        trend: 'up'
-      },
-      // Voice agents - sum to $3500 (aiAgentVoice.used)
-      {
-        name: 'Voice Support Bot',
+        name: 'Sales Voice Agent',
         type: 'voice',
-        conversations: 1266,
-        cost: 1000,
-        previousCost: 1050,
-        trend: 'down'
-      },
-      {
-        name: 'Sales Bot Voice',
-        type: 'voice',
-        conversations: 1139,
-        cost: 900,
-        previousCost: 820,
+        conversations: 1400,
+        cost: 1764,  // 1,400 × $1.26
+        previousCost: 1680,
         trend: 'up'
       },
       {
-        name: 'Voice Routing Bot',
+        name: 'Support Voice Agent',
         type: 'voice',
-        conversations: 1076,
-        cost: 850,
-        previousCost: 790,
+        conversations: 910,
+        cost: 1147,  // 910 × $1.26
+        previousCost: 1092,
         trend: 'up'
-      },
-      {
-        name: 'Customer Success Bot',
-        type: 'voice',
-        conversations: 949,
-        cost: 750,
-        previousCost: 760,
-        trend: 'down'
       }
     ],
 
@@ -841,71 +800,30 @@ export const mockData = {
 
     // Top AI Agents consumption summary (realistic monthly data)
     topAgentsSummary: [
-      // Digital agents - sum to $4000 (aiAgentDigital.used)
+      // 3 realistic agents - sum to 5,610 conversations (33% of 17K pack)
       {
-        name: 'Support Bot Alpha',
+        name: 'Customer Support Agent',
         type: 'digital',
-        conversations: 755,
-        cost: 1200,
-        previousCost: 993,
+        conversations: 3300,
+        cost: 4158,  // 3,300 × $1.26
+        previousCost: 3960,
         trend: 'up'
       },
       {
-        name: 'Digital Sales Bot',
-        type: 'digital',
-        conversations: 692,
-        cost: 1100,
-        previousCost: 910,
-        trend: 'up'
-      },
-      {
-        name: 'Support Bot Beta',
-        type: 'digital',
-        conversations: 597,
-        cost: 950,
-        previousCost: 940,
-        trend: 'up'
-      },
-      {
-        name: 'Marketing Bot',
-        type: 'digital',
-        conversations: 472,
-        cost: 750,
-        previousCost: 680,
-        trend: 'up'
-      },
-      // Voice agents - sum to $3500 (aiAgentVoice.used)
-      {
-        name: 'Voice Support Bot',
+        name: 'Sales Voice Agent',
         type: 'voice',
-        conversations: 1266,
-        cost: 1000,
-        previousCost: 1050,
-        trend: 'down'
-      },
-      {
-        name: 'Sales Bot Voice',
-        type: 'voice',
-        conversations: 1139,
-        cost: 900,
-        previousCost: 820,
+        conversations: 1400,
+        cost: 1764,  // 1,400 × $1.26
+        previousCost: 1680,
         trend: 'up'
       },
       {
-        name: 'Voice Routing Bot',
+        name: 'Support Voice Agent',
         type: 'voice',
-        conversations: 1076,
-        cost: 850,
-        previousCost: 790,
+        conversations: 910,
+        cost: 1147,  // 910 × $1.26
+        previousCost: 1092,
         trend: 'up'
-      },
-      {
-        name: 'Customer Success Bot',
-        type: 'voice',
-        conversations: 949,
-        cost: 750,
-        previousCost: 760,
-        trend: 'down'
       }
     ],
 
